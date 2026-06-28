@@ -1,0 +1,39 @@
+# Ports the controller is permitted to expose or hide.
+# The controller may ONLY touch ports listed here — nothing else.
+# phases: list of phases in which this port may be active.
+
+ports:
+  - port: 22
+    protocol: tcp
+    service: cowrie-ssh
+    phases: [static, adaptive, adaptive_ml]
+
+  - port: 23
+    protocol: tcp
+    service: cowrie-telnet
+    phases: [static, adaptive, adaptive_ml]
+
+  - port: 21
+    protocol: tcp
+    service: dionaea-ftp
+    phases: [static, adaptive, adaptive_ml]
+
+  - port: 25
+    protocol: tcp
+    service: dionaea-smtp
+    phases: [static, adaptive, adaptive_ml]
+
+  - port: 80
+    protocol: tcp
+    service: dionaea-http
+    phases: [static, adaptive, adaptive_ml]
+
+  - port: 443
+    protocol: tcp
+    service: dionaea-https
+    phases: [static, adaptive, adaptive_ml]
+
+  - port: 445
+    protocol: tcp
+    service: dionaea-smb
+    phases: [static, adaptive, adaptive_ml]

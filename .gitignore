@@ -1,0 +1,21 @@
+# Environment
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# ML model artifacts (large binaries)
+ml/models/*.joblib
+ml/models/*.pkl
+
+# Captured honeypot data (sensitive)
+data/honeypot/
+data/raw/
+data/processed/
+
+# Pytest
+.pytest_cache/
