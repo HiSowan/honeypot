@@ -11,9 +11,10 @@
       "title": "Cowrie SSH/Telnet Events",
       "type": "logs",
       "gridPos": { "h": 10, "w": 24, "x": 0, "y": 0 },
-      "datasource": { "type": "loki", "uid": "loki" },
+      "datasource": null,
       "targets": [
         {
+          "datasource": null,
           "expr": "{job=\"cowrie\"}",
           "refId": "A"
         }
@@ -24,9 +25,10 @@
       "title": "Zeek Connection Log",
       "type": "logs",
       "gridPos": { "h": 10, "w": 24, "x": 0, "y": 10 },
-      "datasource": { "type": "loki", "uid": "loki" },
+      "datasource": null,
       "targets": [
         {
+          "datasource": null,
           "expr": "{job=\"zeek\"}",
           "refId": "A"
         }
