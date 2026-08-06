@@ -1,0 +1,18 @@
+[Unit]
+Description=Honeypot Adaptive Controller
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/home/vboxuser/honeypot
+ExecStart=/home/vboxuser/honeypot/venv/bin/python3 -m controller.main
+Restart=on-failure
+RestartSec=10
+StandardOutput=append:/var/log/honeypot/controller.log
+StandardError=append:/var/log/honeypot/controller.log
+Environment=FIREWALL_LIVE=0
+Environment=ML_LIVE=0
+
+[Install]
+WantedBy=multi-user.target
