@@ -1,0 +1,15 @@
+[Unit]
+Description=Loki Log Aggregation
+After=network.target
+
+[Service]
+Type=simple
+User=loki
+ExecStartPre=/bin/mkdir -p /opt/loki/data/chunks /opt/loki/data/rules
+ExecStartPre=/bin/chown -R loki:loki /opt/loki/data
+ExecStart=/opt/loki/loki -config.file=/opt/loki/loki-config.yaml
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
