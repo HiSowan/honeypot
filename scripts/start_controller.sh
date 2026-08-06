@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 # Start the honeypot controller in the background.
 # Logs go to /var/log/honeypot/controller.log
-# Usage: sudo bash scripts/start_controller.sh [--live]
+# Usage: sudo bash scripts/start_controller.sh [--live] [--ml-live]
 #
-# --live   enables live firewall rules (FIREWALL_LIVE=1)
-#          Omit for dry-run mode (default, safe during build phase).
+# --live     enables live firewall rules (FIREWALL_LIVE=1)
+# --ml-live  enables live ML blocking (ML_LIVE=1); shadow mode only if omitted
+# Omit both for fully dry-run mode (default, safe during build phase).
 
 set -euo pipefail
 
@@ -30,7 +31,8 @@ FIREWALL_LIVE=0
 ML_LIVE=0
 for arg in "$@"; do
     case "$arg" in
-        --live) FIREWALL_LIVE=1 ;;
+        --live)    FIREWALL_LIVE=1 ;;
+        --ml-live) ML_LIVE=1 ;;
     esac
 done
 
