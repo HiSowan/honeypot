@@ -56,5 +56,5 @@ class Predictor:
         vec = _conn_to_vector(rec)
         attack_type = self._rf.predict(vec)[0]
         score = float(self._if.decision_function(vec)[0])
-        is_anomaly = self._if.predict(vec)[0] == -1
+        is_anomaly = bool(self._if.predict(vec)[0] == -1)
         return Prediction(attack_type=attack_type, is_anomaly=is_anomaly, anomaly_score=score)
