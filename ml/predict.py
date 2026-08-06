@@ -5,6 +5,7 @@ from pathlib import Path
 
 import joblib
 import numpy as np
+import pandas as pd
 
 from .features import FEATURE_COLS
 
@@ -21,7 +22,7 @@ class Prediction:
     anomaly_score: float    # raw IF decision score (lower = more anomalous)
 
 
-def _conn_to_vector(rec) -> np.ndarray:
+def _conn_to_vector(rec) -> pd.DataFrame:
     """Convert a ConnRecord to a feature vector matching FEATURE_COLS."""
     proto = (rec.proto or "").lower()
     state = (rec.conn_state or "").upper()
@@ -39,7 +40,7 @@ def _conn_to_vector(rec) -> np.ndarray:
         "conn_state_REJ":  int(state == "REJ"),
         "conn_state_RSTO": int(state == "RSTO"),
     }
-    return np.array([row[f] for f in FEATURE_COLS], dtype=float).reshape(1, -1)
+    return pd.DataFrame([{f: row[f] for f in FEATURE_COLS}])
 
 
 class Predictor:
