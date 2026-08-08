@@ -13,6 +13,7 @@ StandardOutput=append:/var/log/honeypot/controller.log
 StandardError=append:/var/log/honeypot/controller.log
 Environment=FIREWALL_LIVE=0
 Environment=ML_LIVE=0
+Environment=PYTHONWARNINGS=ignore::UserWarning
 
 [Install]
 WantedBy=multi-user.target

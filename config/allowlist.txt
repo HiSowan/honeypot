@@ -1,3 +1,5 @@
 # Operator IPs — NEVER auto-blocked by the ML pipeline or controller
 # One IP or CIDR per line; blank lines and # comments are ignored
 192.168.0.3
+127.0.0.1
+10.0.2.15
