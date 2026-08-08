@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 
 RF_MODEL_PATH = Path(__file__).parent / "models" / "rf_attack_type.joblib"
 IF_MODEL_PATH = Path(__file__).parent / "models" / "iforest_anomaly.joblib"
+IF_LIVE_PATH  = Path(__file__).parent / "models" / "iforest_live.joblib"
 
 
 @dataclass
@@ -47,9 +48,12 @@ class Predictor:
     def __init__(
         self,
         rf_path: Path = RF_MODEL_PATH,
-        if_path: Path = IF_MODEL_PATH,
+        if_path: Path | None = None,
     ) -> None:
         self._rf = joblib.load(rf_path)
+        # Prefer live-retrained IForest; fall back to UNSW-NB15 model
+        if if_path is None:
+            if_path = IF_LIVE_PATH if IF_LIVE_PATH.exists() else IF_MODEL_PATH
         self._if = joblib.load(if_path)
         logger.info("Models loaded: RF=%s, IF=%s", rf_path.name, if_path.name)
 
