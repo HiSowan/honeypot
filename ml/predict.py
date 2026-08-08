@@ -1,11 +1,14 @@
 """Inference wrapper — loads saved models and scores a single Zeek ConnRecord."""
 import logging
+import warnings
 from dataclasses import dataclass
 from pathlib import Path
 
 import joblib
 import numpy as np
 import pandas as pd
+
+warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
 
 from .features import FEATURE_COLS
 
