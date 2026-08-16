@@ -26,9 +26,19 @@ from sklearn.metrics import (
     confusion_matrix, classification_report,
 )
 
-MODELS   = ROOT / "ml" / "models"
-LIVE_LOG = Path("/opt/zeek/logs/current/conn.log")
-OUT      = ROOT / "ml" / "eval_precision_recall.txt"
+import argparse
+
+MODELS  = ROOT / "ml" / "models"
+OUT     = ROOT / "ml" / "eval_precision_recall.txt"
+
+_parser = argparse.ArgumentParser(description="IForest ground-truth precision/recall")
+_parser.add_argument(
+    "--log", type=Path,
+    default=Path("/opt/zeek/logs/current/conn.log"),
+    help="Path to Zeek conn.log (plain or .gz)"
+)
+_args    = _parser.parse_args()
+LIVE_LOG = _args.log
 
 ATTACKER_IP   = "10.10.0.2"   # Kali VM — confirmed attack source
 BLOCK_THRESH  = -0.1          # must match controller ML_BLOCK_THRESHOLD
@@ -53,8 +63,11 @@ def sec(title):
 # ── Parse conn.log — keep source IP for labelling ────────────────────────
 sec("PARSING LIVE ZEEK CONN.LOG")
 
+import gzip
+
 rows, src_ips = [], []
-with open(LIVE_LOG) as f:
+opener = gzip.open if str(LIVE_LOG).endswith(".gz") else open
+with opener(LIVE_LOG, "rt") as f:
     for line in f:
         if line.startswith("#"):
             continue
