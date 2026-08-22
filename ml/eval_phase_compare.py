@@ -88,11 +88,14 @@ def snapshot_state(label):
 
 
 def parse_ports_from_snapshot(text):
-    """Return {port: verdict} from iptables -L output."""
+    """Return {port: verdict} from iptables -L --line-numbers output."""
     result = {}
     for line in text.splitlines():
         if "tcp dpt:" in line:
-            verdict = line.split()[0]   # ACCEPT or DROP
+            parts = line.split()
+            # With --line-numbers: col0=num, col1=target(ACCEPT/DROP)
+            # Without: col0=target
+            verdict = parts[1] if parts[0].isdigit() else parts[0]
             port_part = [t for t in line.split() if t.startswith("dpt:")]
             if port_part:
                 port = int(port_part[0].split(":")[1])
