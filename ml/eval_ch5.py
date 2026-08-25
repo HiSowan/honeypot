@@ -21,6 +21,12 @@ from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
 from collections import Counter
 
+# Use the shared preprocessing pipeline so eval and training always use the
+# same Argus→Zeek state vocabulary mapping.  (The original inline encoding
+# here skipped that mapping, producing four dead conn_state_ columns on
+# UNSW-NB15 data — the same bug that was fixed in ml/preprocess.py.)
+from ml.preprocess import load_unsw, build_features
+
 MODELS   = ROOT / "ml" / "models"
 UNSW_CSV = ROOT / "data" / "raw" / "UNSW_NB15_training-set.CSV"
 LIVE_LOG = Path("/opt/zeek/logs/current/conn.log")
@@ -50,21 +56,8 @@ def sec(title):
 # ── 1. RF per-class report on UNSW-NB15 ──────────────────────────────────
 sec("1. RANDOM FOREST — Per-Class Report (UNSW-NB15 test set)")
 
-df = pd.read_csv(UNSW_CSV, low_memory=False)
-df.columns = df.columns.str.strip().str.lower()
-df = df.rename(columns={
-    "dur": "duration", "sbytes": "orig_bytes", "dbytes": "resp_bytes",
-    "spkts": "orig_pkts", "dpkts": "resp_pkts",
-    "proto": "proto", "state": "conn_state",
-})
-for p in ("tcp", "udp", "icmp"):
-    df[f"proto_{p}"] = (df["proto"].str.lower() == p).astype(int)
-for s in ("S0", "SF", "REJ", "RSTO"):
-    df[f"conn_state_{s}"] = (df["conn_state"].str.upper() == s).astype(int)
-
-X = df[FEATURE_COLS].fillna(0).astype(float)
-y = df["attack_cat"].fillna("Normal").str.strip()
-y = y.where(y.isin(ATTACK_CATS), other="Normal")
+df_raw = load_unsw(UNSW_CSV)
+X, y = build_features(df_raw)
 
 _, X_test, _, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42, stratify=y
