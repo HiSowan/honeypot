@@ -109,3 +109,30 @@ class Firewall:
 
     def blocked_ips(self) -> frozenset[str]:
         return frozenset(self._blocked_ips)
+
+    # ------------------------------------------------------------------
+    # PREROUTING DNAT/REDIRECT (Cowrie port rotation — Phase 2/3)
+    # ------------------------------------------------------------------
+
+    def add_prerouting_redirect(self, ext_port: int, int_port: int,
+                                proto: str = "tcp") -> None:
+        """Insert a nat/PREROUTING REDIRECT rule: packets arriving on ext_port
+        are transparently redirected to the local Cowrie listener at int_port.
+
+        This must be called BEFORE any INPUT rules so that Cowrie-managed ports
+        can be rotated independently of the INPUT chain.
+        """
+        args = ["-t", "nat", "-I", "PREROUTING",
+                "-p", proto, "--dport", str(ext_port),
+                "-j", "REDIRECT", "--to-port", str(int_port)]
+        self._run(args)
+        logger.info("PREROUTING: :%d → Cowrie :%d added", ext_port, int_port)
+
+    def del_prerouting_redirect(self, ext_port: int, int_port: int,
+                                proto: str = "tcp") -> None:
+        """Delete the nat/PREROUTING REDIRECT rule for ext_port → int_port."""
+        args = ["-t", "nat", "-D", "PREROUTING",
+                "-p", proto, "--dport", str(ext_port),
+                "-j", "REDIRECT", "--to-port", str(int_port)]
+        self._run(args)
+        logger.info("PREROUTING: :%d → Cowrie :%d removed", ext_port, int_port)

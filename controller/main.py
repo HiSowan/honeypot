@@ -23,6 +23,16 @@ SCAN_PORT_THRESHOLD = 5
 SYN_SCAN_THRESHOLD = 10
 ML_BLOCK_THRESHOLD = -0.1
 
+# Cowrie's internal listener ports — never modified by rotation
+_COWRIE_SSH_PORT = 2222
+_COWRIE_TEL_PORT = 2223
+
+# External port pools for Cowrie PREROUTING rotation.
+# On each new-scanner detection the external port advances one step so that the
+# well-known port (22 / 23) appears closed to any follow-up scan.
+_SSH_EXT_POOL = [22, 2022, 5022]
+_TEL_EXT_POOL = [23, 2023, 5023]
+
 
 def _find_conn_log(zeek_log_dir: Path) -> Path | None:
     candidate = zeek_log_dir / "conn.log"
@@ -48,6 +58,31 @@ def _adaptive_rotate(f: IPFeatures, allowed_ports: list[dict], fw: Firewall) -> 
             fw.close_port(port, proto)
         else:
             fw.open_port(port, proto)
+
+
+def _rotate_cowrie_ports(
+    ssh_ext: int, tel_ext: int, fw: Firewall
+) -> tuple[int, int]:
+    """Advance Cowrie's external PREROUTING ports one step in each pool.
+
+    Removes the current PREROUTING REDIRECT rules for ssh_ext/tel_ext and
+    adds new rules for the next entries in _SSH_EXT_POOL / _TEL_EXT_POOL.
+    The Cowrie listeners (_COWRIE_SSH_PORT, _COWRIE_TEL_PORT) are never touched.
+    Returns the new (ssh_ext, tel_ext).
+    """
+    ssh_next = _SSH_EXT_POOL[(_SSH_EXT_POOL.index(ssh_ext) + 1) % len(_SSH_EXT_POOL)]
+    tel_next = _TEL_EXT_POOL[(_TEL_EXT_POOL.index(tel_ext) + 1) % len(_TEL_EXT_POOL)]
+
+    fw.del_prerouting_redirect(ssh_ext, _COWRIE_SSH_PORT)
+    fw.add_prerouting_redirect(ssh_next, _COWRIE_SSH_PORT)
+    fw.del_prerouting_redirect(tel_ext, _COWRIE_TEL_PORT)
+    fw.add_prerouting_redirect(tel_next, _COWRIE_TEL_PORT)
+
+    logger.info(
+        "Cowrie PREROUTING rotated — SSH :%d→:%d  Telnet :%d→:%d",
+        ssh_ext, ssh_next, tel_ext, tel_next,
+    )
+    return ssh_next, tel_next
 
 
 def _load_ml():
@@ -79,6 +114,12 @@ def run(zeek_log_dir: Path, dry_run: bool = True) -> None:
 
     predictor = None
     shadow = None
+
+    # Track current Cowrie external ports and which scanner IPs have already
+    # triggered a PREROUTING rotation (avoid re-rotating on every tick).
+    cowrie_ssh_ext = 22
+    cowrie_tel_ext = 23
+    seen_scanners: set[str] = set()
 
     while True:
         phase = read_phase()
@@ -130,6 +171,11 @@ def run(zeek_log_dir: Path, dry_run: bool = True) -> None:
             if phase in ("adaptive", "adaptive_ml") and _is_scanner(f):
                 logger.info("Scanner detected: %s — rotating ports", ip)
                 _adaptive_rotate(f, allowed_ports, fw)
+                if ip not in seen_scanners:
+                    cowrie_ssh_ext, cowrie_tel_ext = _rotate_cowrie_ports(
+                        cowrie_ssh_ext, cowrie_tel_ext, fw
+                    )
+                    seen_scanners.add(ip)
 
             if phase == "adaptive_ml" and ip in ml_flagged:
                 if ml_live:
