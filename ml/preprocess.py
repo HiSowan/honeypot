@@ -8,12 +8,21 @@ from .features import UNSW_COL_MAP, UNSW_LABEL_COL, FEATURE_COLS, ATTACK_CATEGOR
 # Without this map all four conn_state_ columns are 0 for every training record,
 # because no UNSW-NB15 record has a state value of S0, SF, REJ, or RSTO.
 _UNSW_STATE_TO_ZEEK: dict[str, str] = {
+    # UNSW-NB15 Argus vocabulary → Zeek vocabulary
     "REQ": "S0",    # connection request, no reply → SYN sent, no SYN-ACK
     "FIN": "SF",    # cleanly terminated via FIN → established + cleanly closed
     "CON": "SF",    # established / ongoing → closest Zeek equivalent
     "CLO": "SF",    # closed connection
     "RST": "RSTO",  # reset by either side
     # INT (active/interrupted) has no clean Zeek mapping; leaves all columns 0
+    # Zeek vocabulary pass-through — guards against build_features() ever being
+    # called with live Zeek data; without these, .map(dict).fillna("") silently
+    # converts Zeek states to "" and zeros all four conn_state features.
+    "S0":   "S0",
+    "SF":   "SF",
+    "REJ":  "REJ",
+    "RSTO": "RSTO",
+    "OTH":  "OTH",
 }
 
 
