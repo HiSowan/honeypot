@@ -19,3 +19,14 @@ data/processed/
 
 # Pytest
 .pytest_cache/
+
+# Thesis page renders and intermediate QA drafts.
+# Large (~300 MB) and fully regenerable from the DOCX — evidence JSON/CSV,
+# manifests and the final submission documents are still tracked.
+artifacts/**/render/
+artifacts/**/render2/
+artifacts/**/*_render/
+artifacts/**/qa_synthetic/
+
+# Local venv and scratch
+Claude outputs/

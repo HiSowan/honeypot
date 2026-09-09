@@ -7,7 +7,7 @@ from pathlib import Path
 from .allowlist import load_allowlist, is_allowlisted
 from .feature_extractor import extract_features, IPFeatures
 from .firewall import Firewall
-from .log_parser import parse_conn_log
+from .log_parser import ParseStats, parse_conn_log
 from .phase_manager import read_phase, ports_for_phase
 
 logging.basicConfig(
@@ -32,6 +32,7 @@ _COWRIE_TEL_PORT = 2223
 # well-known port (22 / 23) appears closed to any follow-up scan.
 _SSH_EXT_POOL = [22, 2022, 5022]
 _TEL_EXT_POOL = [23, 2023, 5023]
+_COWRIE_PORTS = {_COWRIE_SSH_PORT, _COWRIE_TEL_PORT, *_SSH_EXT_POOL, *_TEL_EXT_POOL}
 
 
 def _find_conn_log(zeek_log_dir: Path) -> Path | None:
@@ -53,11 +54,23 @@ def _adaptive_rotate(f: IPFeatures, allowed_ports: list[dict], fw: Firewall) -> 
     for entry in allowed_ports:
         port = entry["port"]
         proto = entry.get("protocol", "tcp")
+        if proto == "tcp" and port in _COWRIE_PORTS:
+            # REDIRECT runs before INPUT: Cowrie exposure is controlled in NAT.
+            # An INPUT DROP on :22 instead blocks the management SSH connection
+            # that intentionally bypasses REDIRECT; never alter these listeners.
+            continue
         if port in probed:
             logger.info("Adaptive: closing probed port %d/%s due to scanner %s", port, proto, f.ip)
             fw.close_port(port, proto)
         else:
             fw.open_port(port, proto)
+
+
+def _next_cowrie_port(current: int, pool: list[int]) -> int:
+    if current not in pool:
+        logger.warning("Cowrie external port %d is outside pool %s; resetting to %d", current, pool, pool[0])
+        return pool[0]
+    return pool[(pool.index(current) + 1) % len(pool)]
 
 
 def _rotate_cowrie_ports(
@@ -70,13 +83,14 @@ def _rotate_cowrie_ports(
     The Cowrie listeners (_COWRIE_SSH_PORT, _COWRIE_TEL_PORT) are never touched.
     Returns the new (ssh_ext, tel_ext).
     """
-    ssh_next = _SSH_EXT_POOL[(_SSH_EXT_POOL.index(ssh_ext) + 1) % len(_SSH_EXT_POOL)]
-    tel_next = _TEL_EXT_POOL[(_TEL_EXT_POOL.index(tel_ext) + 1) % len(_TEL_EXT_POOL)]
+    ssh_next = _next_cowrie_port(ssh_ext, _SSH_EXT_POOL)
+    tel_next = _next_cowrie_port(tel_ext, _TEL_EXT_POOL)
 
-    fw.del_prerouting_redirect(ssh_ext, _COWRIE_SSH_PORT)
+    # Keep the existing listener reachable if insertion of the new rule fails.
     fw.add_prerouting_redirect(ssh_next, _COWRIE_SSH_PORT)
-    fw.del_prerouting_redirect(tel_ext, _COWRIE_TEL_PORT)
+    fw.del_prerouting_redirect(ssh_ext, _COWRIE_SSH_PORT)
     fw.add_prerouting_redirect(tel_next, _COWRIE_TEL_PORT)
+    fw.del_prerouting_redirect(tel_ext, _COWRIE_TEL_PORT)
 
     logger.info(
         "Cowrie PREROUTING rotated — SSH :%d→:%d  Telnet :%d→:%d",
@@ -119,12 +133,18 @@ def run(zeek_log_dir: Path, dry_run: bool = True) -> None:
     # triggered a PREROUTING rotation (avoid re-rotating on every tick).
     cowrie_ssh_ext = 22
     cowrie_tel_ext = 23
+    ports_reconciled = False
     seen_scanners: set[str] = set()
 
     while True:
         phase = read_phase()
         allowed_ports = ports_for_phase(phase)
         logger.info("Phase: %s | Permitted ports: %s", phase, [p["port"] for p in allowed_ports])
+
+        if phase in ("adaptive", "adaptive_ml") and not ports_reconciled:
+            cowrie_ssh_ext = fw.current_redirect_port(_COWRIE_SSH_PORT, 22)
+            cowrie_tel_ext = fw.current_redirect_port(_COWRIE_TEL_PORT, 23)
+            ports_reconciled = True
 
         if phase == "adaptive_ml" and predictor is None:
             predictor, shadow = _load_ml()
@@ -139,12 +159,15 @@ def run(zeek_log_dir: Path, dry_run: bool = True) -> None:
         window_start = now - FEATURE_WINDOW
 
         try:
-            records = list(parse_conn_log(conn_log))
+            parse_stats = ParseStats()
+            records = list(parse_conn_log(conn_log, stats=parse_stats))
         except OSError as e:
             logger.error("Could not read conn.log: %s", e)
             time.sleep(POLL_INTERVAL)
             continue
 
+        logger.info("conn.log read: %d records, skipped %d malformed rows (%s)",
+                    parse_stats.yielded, parse_stats.skipped, parse_stats.reasons)
         features = extract_features(records, window_start, now)
         window_records = [r for r in records if window_start <= r.ts <= now]
 

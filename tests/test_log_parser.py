@@ -1,4 +1,5 @@
 from pathlib import Path
+import pytest
 from controller.log_parser import parse_conn_log
 
 SAMPLE = """\
@@ -40,3 +41,21 @@ def test_unset_fields_are_none(tmp_path):
     assert r.duration is None
     assert r.orig_bytes is None
     assert r.conn_state == "S0"
+
+
+@pytest.mark.parametrize("malformed_index", range(7))
+def test_malformed_rows_do_not_hide_later_valid_records(tmp_path, malformed_index):
+    header, first, second = SAMPLE.rstrip('\n').rsplit('\n', 2)
+    malformed = [
+        '',
+        first.replace('1700000000.0', 'invalid', 1),
+        first.replace('1700000000.0', '-', 1),
+        first.replace('1700000000.0', 'nan', 1),
+        first.replace('1700000000.0', 'inf', 1),
+        '\t'.join(first.split('\t')[:7]),
+        first + '\textra',
+    ]
+    p = tmp_path / 'conn.log'
+    p.write_text('\n'.join([header, first, malformed[malformed_index], second]) + '\n')
+    records = list(parse_conn_log(p))
+    assert [r.uid for r in records] == ['Cabc123', 'Cdef456']

@@ -1,7 +1,25 @@
 """Parse Zeek TSV log files from disk."""
-from dataclasses import dataclass
+import logging
+from ipaddress import ip_address
+from dataclasses import dataclass, field
+from math import isfinite
 from pathlib import Path
 from typing import Iterator
+
+
+logger = logging.getLogger(__name__)
+
+
+@dataclass
+class ParseStats:
+    """Per-read diagnostics; callers can supply one without changing iteration."""
+    yielded: int = 0
+    skipped: int = 0
+    reasons: dict[str, int] = field(default_factory=dict)
+
+    def reject(self, reason: str) -> None:
+        self.skipped += 1
+        self.reasons[reason] = self.reasons.get(reason, 0) + 1
 
 
 @dataclass
@@ -31,8 +49,10 @@ def _cast(value: str, typ):
         return None
 
 
-def parse_conn_log(path: Path) -> Iterator[ConnRecord]:
-    """Yield ConnRecord objects from a Zeek conn.log file."""
+def parse_conn_log(path: Path, stats: ParseStats | None = None) -> Iterator[ConnRecord]:
+    """Yield records, skipping malformed rows and invalid timestamps."""
+    if stats is None:
+        stats = ParseStats()
     fields: list[str] | None = None
 
     with open(path) as f:
@@ -45,13 +65,28 @@ def parse_conn_log(path: Path) -> Iterator[ConnRecord]:
             if line.startswith("#"):
                 continue
             if fields is None:
+                stats.reject("missing_header")
                 continue
 
             parts = line.split("\t")
+            if len(parts) != len(fields):
+                stats.reject("column_count")
+                continue
             row = dict(zip(fields, parts))
+            ts = _cast(row.get("ts", "-"), float)
+            if ts is None or not isfinite(ts):
+                stats.reject("timestamp")
+                continue
+            try:
+                ip_address(row.get("id.orig_h", ""))
+                ip_address(row.get("id.resp_h", ""))
+            except ValueError:
+                stats.reject("ip_address")
+                continue
 
+            stats.yielded += 1
             yield ConnRecord(
-                ts=float(row.get("ts", 0)),
+                ts=ts,
                 uid=row.get("uid", ""),
                 src_ip=row.get("id.orig_h", ""),
                 src_port=_cast(row.get("id.orig_p", "-"), int) or 0,
@@ -65,3 +100,6 @@ def parse_conn_log(path: Path) -> Iterator[ConnRecord]:
                 orig_pkts=_cast(row.get("orig_pkts", "-"), int),
                 resp_pkts=_cast(row.get("resp_pkts", "-"), int),
             )
+
+    if stats.skipped:
+        logger.warning("Skipped %d malformed conn.log rows: %s", stats.skipped, stats.reasons)

@@ -1,5 +1,8 @@
 import ipaddress
+import logging
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 _DEFAULT_PATH = Path(__file__).parent.parent / "config" / "allowlist.txt"
 
@@ -16,7 +19,11 @@ def load_allowlist(path: Path = _DEFAULT_PATH) -> list[ipaddress.IPv4Network | i
 
 
 def is_allowlisted(ip: str, networks: list | None = None) -> bool:
+    try:
+        addr = ipaddress.ip_address(ip)
+    except ValueError:
+        logger.debug("Ignoring unparseable address in allow-list check: %r", ip)
+        return False
     if networks is None:
         networks = load_allowlist()
-    addr = ipaddress.ip_address(ip)
     return any(addr in net for net in networks)

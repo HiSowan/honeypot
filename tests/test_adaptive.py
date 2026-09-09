@@ -25,7 +25,7 @@ def test_non_scanner_not_flagged():
     assert _is_scanner(f) is False
 
 
-def test_adaptive_rotate_closes_probed_port():
+def test_adaptive_rotate_leaves_cowrie_to_prerouting():
     fw = Firewall(dry_run=True)
     f = _features(ports={22})
     allowed = [{"port": 22, "protocol": "tcp"}, {"port": 80, "protocol": "tcp"}]
