@@ -29,4 +29,4 @@ artifacts/**/*_render/
 artifacts/**/qa_synthetic/
 
 # Local venv and scratch
-Claude outputs/
+ai_outputs/

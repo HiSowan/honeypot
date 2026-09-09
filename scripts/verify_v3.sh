@@ -1,5 +1,5 @@
-#!/usr/bin/env bash
-# verify_v3.sh  —  Parts 1–5 verification, round 3
+﻿#!/usr/bin/env bash
+# verify_v3.sh  â€”  Parts 1â€“5 verification, round 3
 #
 # Run from ~/honeypot with venv active:
 #   cd ~/honeypot
@@ -16,9 +16,9 @@ MODELS="ml/models"
 TODAY=$(date +%Y-%m-%d)
 SNAP="/tmp/conn_current_snap.log"
 
-# ── Backup .joblib files ───────────────────────────────────────────────────────
+# â”€â”€ Backup .joblib files â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 echo "$SEP"
-echo "BACKUP: .joblib files → $MODELS/archive/$TODAY/"
+echo "BACKUP: .joblib files â†’ $MODELS/archive/$TODAY/"
 echo "$SEP"
 mkdir -p "$MODELS/archive/$TODAY"
 for f in "$MODELS"/*.joblib; do
@@ -26,7 +26,7 @@ for f in "$MODELS"/*.joblib; do
 done
 echo ""
 
-# ── Snapshot current conn.log once for all parts (fixes Part 4 off-by-two) ────
+# â”€â”€ Snapshot current conn.log once for all parts (fixes Part 4 off-by-two) â”€â”€â”€â”€
 echo "$SEP"
 echo "SNAPSHOT: copying current conn.log once so all parts use identical data"
 echo "$SEP"
@@ -35,12 +35,12 @@ if [ -f "/opt/zeek/logs/current/conn.log" ]; then
     echo "  snapshot saved to $SNAP"
     wc -l < "$SNAP" | xargs echo "  lines in snapshot:"
 else
-    echo "  WARNING: /opt/zeek/logs/current/conn.log not found — snapshot empty"
+    echo "  WARNING: /opt/zeek/logs/current/conn.log not found â€” snapshot empty"
     touch "$SNAP"
 fi
 echo ""
 
-# ── PART 1: Allowlist-excluded population ─────────────────────────────────────
+# â”€â”€ PART 1: Allowlist-excluded population â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 echo "$SEP"
 echo "PART 1: ALLOWLIST EXCLUSION ANALYSIS"
 echo "$SEP"
@@ -124,7 +124,7 @@ for p in arch_logs + [SNAP]:
 total = len(records)
 print(f"uid-deduped total records: {total:,}")
 
-# ── Allowlist breakdown ────────────────────────────────────────────────────────
+# â”€â”€ Allowlist breakdown â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 print("\nALLOWLIST ENTRIES (from config/allowlist.txt):")
 for ip in sorted(ALLOWLIST):
     cnt = sum(1 for r in records if r[0]==ip)
@@ -136,7 +136,7 @@ for ip, cnt in by_src.most_common(12):
     tag = " [ALLOWLISTED]" if ip in ALLOWLIST else (" [ATTACKER]" if ip==KALI else "")
     print(f"  {ip:<45} {cnt:>7,}{tag}")
 
-# ── Run both models on full archive ───────────────────────────────────────────
+# â”€â”€ Run both models on full archive â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 X_all = np.array([r[2] for r in records], dtype=float)
 y_all = np.array([1 if r[0]==KALI else 0 for r in records], dtype=int)
 
@@ -160,8 +160,8 @@ def eval_model(model, X, y, label, prefix=""):
     print(f"  {label}")
     print(f"    n={len(y):,}  attack={y.sum():,} ({base:.2f}%)")
     print(f"    TP={TP}  FP={FP}  TN={TN}  FN={FN}")
-    print(f"    Precision: {P:.3f}  [95% CI: {Pci[0]:.3f}–{Pci[1]:.3f}]  (n={TP+FP})")
-    print(f"    Recall:    {R:.3f}  [95% CI: {Rci[0]:.3f}–{Rci[1]:.3f}]  (n={TP+FN})")
+    print(f"    Precision: {P:.3f}  [95% CI: {Pci[0]:.3f}â€“{Pci[1]:.3f}]  (n={TP+FP})")
+    print(f"    Recall:    {R:.3f}  [95% CI: {Rci[0]:.3f}â€“{Rci[1]:.3f}]  (n={TP+FN})")
     print(f"    F1:        {F:.3f}")
     print(f"    Flag rate: {TP+FP}/{len(y)} ({100*(TP+FP)/len(y):.2f}%)")
     print()
@@ -184,7 +184,7 @@ print("\n=== FULL ARCHIVE (all sources) ===")
 fp_unsw_full = eval_model(MODEL_UNSW, X_all, y_all, "UNSW-corrected")
 fp_live_full = eval_model(MODEL_LIVE, X_all, y_all, "Live-retrained")
 
-# ── Allowlist-excluded evaluation ─────────────────────────────────────────────
+# â”€â”€ Allowlist-excluded evaluation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 excl_mask = [r[0] not in ALLOWLIST for r in records]
 X_excl = np.array([r[2] for i,r in enumerate(records) if excl_mask[i]], dtype=float)
 y_excl = np.array([1 if r[0]==KALI else 0 for i,r in enumerate(records) if excl_mask[i]], dtype=int)
@@ -203,7 +203,7 @@ print()
 eval_model(MODEL_UNSW, X_excl, y_excl, "UNSW-corrected (allowlist-excluded)")
 eval_model(MODEL_LIVE, X_excl, y_excl, "Live-retrained (allowlist-excluded)")
 
-# ── Eval_ch5 defect confirmation ──────────────────────────────────────────────
+# â”€â”€ Eval_ch5 defect confirmation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 print("=== EVAL_CH5.PY METHODOLOGICAL NOTE ===")
 print("eval_ch5.py reads /opt/zeek/logs/current/conn.log with no allowlist filtering.")
 print("Allowlisted sources (127.0.0.1, 10.0.2.15, 192.168.0.3) are included in the")
@@ -212,9 +212,9 @@ print("This is a defect in the evaluation harness, not in the deployed controlle
 PYEOF
 echo ""
 
-# ── PART 2: UNSW-NB15 state coverage ──────────────────────────────────────────
+# â”€â”€ PART 2: UNSW-NB15 state coverage â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 echo "$SEP"
-echo "PART 2: UNSW-NB15 STATE COLUMN — complete value_counts and mapping coverage"
+echo "PART 2: UNSW-NB15 STATE COLUMN â€” complete value_counts and mapping coverage"
 echo "$SEP"
 python3 - <<'PYEOF'
 import pandas as pd
@@ -223,7 +223,7 @@ from pathlib import Path
 CSV = Path("data/raw/UNSW_NB15_training-set.CSV")
 df = pd.read_csv(CSV, low_memory=False)
 df.columns = df.columns.str.strip().str.lower()
-# rename 'state' → 'conn_state' if needed
+# rename 'state' â†’ 'conn_state' if needed
 if "state" in df.columns and "conn_state" not in df.columns:
     df = df.rename(columns={"state":"conn_state"})
 
@@ -282,7 +282,7 @@ print()
 print("PROPOSED MAPPINGS (do not implement yet):")
 proposals = {
     "INT": ("(leave all-zero)",
-            "Connection active/interrupted at capture end — no clean Zeek analogue; "
+            "Connection active/interrupted at capture end â€” no clean Zeek analogue; "
             "closest is OTH (not in FEATURE_COLS). Forcing to SF would assert a clean "
             "close that did not occur. Recommend documenting as 'unsupported; all-zero'."),
     "ECO": ("(leave all-zero)",
@@ -290,28 +290,28 @@ proposals = {
             "conn_state for ICMP in Zeek depends on reply presence. Leave as all-zero to "
             "avoid double-encoding; note in limitations."),
     "PAR": ("(leave all-zero)",
-            "Partial connection — SYN seen without completion. Closest Zeek analogue is S0, "
+            "Partial connection â€” SYN seen without completion. Closest Zeek analogue is S0, "
             "but PAR appears only once; adding it would affect 0.0006% of records."),
     "URN": ("(leave all-zero)",
-            "URN (unresolved) — no Zeek analogue. Single record. Leave as all-zero."),
+            "URN (unresolved) â€” no Zeek analogue. Single record. Leave as all-zero."),
     "NO":  ("(leave all-zero)",
             "Empty/null state. Single record. Leave as all-zero."),
 }
 for state, (mapping, justification) in proposals.items():
     cnt = (df["conn_state"].str.upper()==state).sum() if state in all_raw else 0
-    print(f"  {state:<6} ({cnt:,} records) → {mapping}")
+    print(f"  {state:<6} ({cnt:,} records) â†’ {mapping}")
     print(f"         {justification}")
 
 print()
 total_unresolvable = sum((df["conn_state"].str.upper()==s).sum() for s in unmapped_set)
 print(f"If proposals adopted: all-zero records remain {total_unresolvable:,} ({100*total_unresolvable/n:.2f}%)")
-print("INT is the sole material contributor — the others are negligible (<15 records combined).")
+print("INT is the sole material contributor â€” the others are negligible (<15 records combined).")
 PYEOF
 echo ""
 
-# ── PART 3: State coverage recomputed from archive attack records ──────────────
+# â”€â”€ PART 3: State coverage recomputed from archive attack records â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 echo "$SEP"
-echo "PART 3: STATE COVERAGE — recomputed from archive attack records"
+echo "PART 3: STATE COVERAGE â€” recomputed from archive attack records"
 echo "$SEP"
 python3 - <<PYEOF
 import gzip, sys
@@ -324,7 +324,7 @@ KALI        = "10.10.0.2"
 
 FEATURE_COLS_STATES = ("S0", "SF", "REJ", "RSTO")
 
-# Training vocab after mapping — from Part 2 data
+# Training vocab after mapping â€” from Part 2 data
 TRAINING_VOCAB_WITH_EXAMPLES = {"S0", "SF", "RSTO"}  # REJ has 0 training examples
 TRAINING_VOCAB_ALL_COLS = {"S0", "SF", "REJ", "RSTO"}  # feature columns (REJ col exists)
 
@@ -378,7 +378,7 @@ print()
 print("Attack conn_state distribution (full):")
 for state, cnt in sorted(attack_states.items(), key=lambda x: -x[1]):
     in_train = " [in FEATURE_COLS, training examples>0]" if state in TRAINING_VOCAB_WITH_EXAMPLES else \
-               (" [in FEATURE_COLS, 0 training examples]" if state in TRAINING_VOCAB_ALL_COLS else " [NOT in FEATURE_COLS → all-zero]")
+               (" [in FEATURE_COLS, 0 training examples]" if state in TRAINING_VOCAB_ALL_COLS else " [NOT in FEATURE_COLS â†’ all-zero]")
     print(f"  {state or '(empty)':<10} {cnt:>6,}  ({100*cnt/attack_n:.1f}%){in_train}")
 
 print()
@@ -390,9 +390,9 @@ no_training_repr = attack_n - in_vocab_with_training
 
 print("=== COVERAGE ANALYSIS ===")
 print(f"Training vocabulary with >0 training examples: {TRAINING_VOCAB_WITH_EXAMPLES}")
-print(f"  (REJ is a FEATURE_COL but has 0 UNSW training examples — excluded from 'represented')")
+print(f"  (REJ is a FEATURE_COL but has 0 UNSW training examples â€” excluded from 'represented')")
 print()
-print(f"Attack records with state in training vocab (≥1 example): {in_vocab_with_training:,}  ({100*in_vocab_with_training/attack_n:.1f}%)")
+print(f"Attack records with state in training vocab (â‰¥1 example): {in_vocab_with_training:,}  ({100*in_vocab_with_training/attack_n:.1f}%)")
 for state in TRAINING_VOCAB_WITH_EXAMPLES:
     cnt = attack_states.get(state, 0)
     print(f"  {state}: {cnt:,}  ({100*cnt/attack_n:.1f}%)")
@@ -405,18 +405,18 @@ print("Breakdown of unrepresented records:")
 for state, cnt in sorted(attack_states.items(), key=lambda x: -x[1]):
     if state not in TRAINING_VOCAB_WITH_EXAMPLES:
         reason = "feature column exists, 0 training examples" if state in TRAINING_VOCAB_ALL_COLS \
-                 else "not in FEATURE_COLS → all-zero at inference"
+                 else "not in FEATURE_COLS â†’ all-zero at inference"
         print(f"  {state or '(empty)':<10} {cnt:>6,}  ({100*cnt/attack_n:.1f}%)  [{reason}]")
 
 print()
 pct_no_repr = 100*no_training_repr/attack_n
 print(f"==> {pct_no_repr:.1f}% of live attack records have no training representation")
-print(f"    (Previous round's '0% overlap' figure was from a 499-record background-only log — void.)")
-print(f"    User's calculation: 86.8% — {'CONFIRMED' if abs(pct_no_repr - 86.8) < 0.5 else f'CORRECTED to {pct_no_repr:.1f}%'}")
+print(f"    (Previous round's '0% overlap' figure was from a 499-record background-only log â€” void.)")
+print(f"    User's calculation: 86.8% â€” {'CONFIRMED' if abs(pct_no_repr - 86.8) < 0.5 else f'CORRECTED to {pct_no_repr:.1f}%'}")
 PYEOF
 echo ""
 
-# ── PART 4: Canonical record count reconciliation ─────────────────────────────
+# â”€â”€ PART 4: Canonical record count reconciliation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 echo "$SEP"
 echo "PART 4: CANONICAL RECORD COUNT RECONCILIATION"
 echo "$SEP"
@@ -487,8 +487,8 @@ print(f"  Background:          {bg:,}  ({100*bg/total:.2f}%)")
 print()
 print(f"Previous round reported:")
 print(f"  Part 1 Python block: 34,735")
-print(f"  Part 5 Python block: 34,737  (2 extra — live conn.log written to between blocks)")
-print(f"  This run (snapshot): {total}  — this is the canonical number for all thesis figures")
+print(f"  Part 5 Python block: 34,737  (2 extra â€” live conn.log written to between blocks)")
+print(f"  This run (snapshot): {total}  â€” this is the canonical number for all thesis figures")
 print()
 print(f"Discrepancy cause: Part 5 in verify_v2.sh used a live current/conn.log,")
 print(f"which had 2 records added by Zeek between the two Python script invocations.")
@@ -496,7 +496,7 @@ print(f"Fix: snapshot current conn.log once at script start; all parts use the s
 PYEOF
 echo ""
 
-# ── PART 5: Clean held-out IForest evaluation ─────────────────────────────────
+# â”€â”€ PART 5: Clean held-out IForest evaluation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 echo "$SEP"
 echo "PART 5: CLEAN HELD-OUT IFOREST EVALUATION (70/30 stratified split)"
 echo "$SEP"
@@ -581,9 +581,9 @@ for p in arch_logs + [SNAP]:
 total = len(uid_list)
 print(f"Canonical uid-deduped records: {total:,}")
 
-# ── Stratified 70/30 split on attack records ──────────────────────────────────
-# Rationale: 70/30 on 1,544 attack records → ~463 held-out positives
-# Wilson CI at n=463, P=0.5: half-width ≈ 0.046. Usable (< 0.1 target).
+# â”€â”€ Stratified 70/30 split on attack records â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# Rationale: 70/30 on 1,544 attack records â†’ ~463 held-out positives
+# Wilson CI at n=463, P=0.5: half-width â‰ˆ 0.046. Usable (< 0.1 target).
 
 attack_idx = [i for i, (uid, src, _) in enumerate(uid_list) if src == KALI]
 bg_idx     = [i for i, (uid, src, _) in enumerate(uid_list) if src != KALI]
@@ -618,9 +618,9 @@ print(f"  Held-out attack records: {n_test_attack:,}  (30% of {len(attack_idx):,
 print(f"  Evaluation set: held-out attack + all background = {n_test_attack + n_bg:,}")
 print()
 print(f"Split choice: 70/30 on attack records leaves {n_test_attack} held-out positives.")
-print(f"Wilson CI at n={n_test_attack}, P=0.5: half-width ≈ {1.96*(0.5/n_test_attack**0.5):.3f}  (target <0.05 — {'OK' if 1.96*(0.5/n_test_attack**0.5)<0.05 else 'marginal'})")
+print(f"Wilson CI at n={n_test_attack}, P=0.5: half-width â‰ˆ {1.96*(0.5/n_test_attack**0.5):.3f}  (target <0.05 â€” {'OK' if 1.96*(0.5/n_test_attack**0.5)<0.05 else 'marginal'})")
 
-# ── Train new live IForest ────────────────────────────────────────────────────
+# â”€â”€ Train new live IForest â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 X_train = np.array([uid_list[i][2] for i in train_idx], dtype=float)
 print(f"\nTraining IForest on {len(X_train):,} records (contamination={CONTAMINATION})...")
 clf = IsolationForest(n_estimators=100, contamination=CONTAMINATION,
@@ -642,7 +642,7 @@ with open(manifest_out, "w") as f:
 print(f"Model saved:    {model_out}")
 print(f"Manifest saved: {manifest_out}")
 
-# ── Evaluation ────────────────────────────────────────────────────────────────
+# â”€â”€ Evaluation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 def wilson_ci(k, n, z=1.96):
     if n==0: return (0.0,0.0)
     p=k/n; d=1+z*z/n
@@ -669,8 +669,8 @@ def eval_on(model, eval_indices, bg_indices, label, excl_allowlist=False):
     print(f"  {label}")
     print(f"    n={len(y_e):,}  attack={y_e.sum():,} ({base:.2f}%)")
     print(f"    TP={TP}  FP={FP}  TN={TN}  FN={FN}")
-    print(f"    Precision: {P:.3f}  [95% CI: {Pci[0]:.3f}–{Pci[1]:.3f}]  (n={TP+FP})")
-    print(f"    Recall:    {R:.3f}  [95% CI: {Rci[0]:.3f}–{Rci[1]:.3f}]  (n={TP+FN})")
+    print(f"    Precision: {P:.3f}  [95% CI: {Pci[0]:.3f}â€“{Pci[1]:.3f}]  (n={TP+FP})")
+    print(f"    Recall:    {R:.3f}  [95% CI: {Rci[0]:.3f}â€“{Rci[1]:.3f}]  (n={TP+FN})")
     print(f"    F1:        {F:.3f}")
     print(f"    Flag rate: {TP+FP}/{len(y_e)} ({100*(TP+FP)/len(y_e):.2f}%)")
     print()
@@ -688,5 +688,5 @@ eval_on(clf,         test_attack_idx, bg_idx, "New live IForest (allowlist-excl)
 PYEOF
 echo ""
 echo "$SEP"
-echo "DONE — paste full output to Claude"
+echo "DONE â€” paste full output to the analysis interface"
 echo "$SEP"

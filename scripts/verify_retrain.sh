@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+﻿#!/usr/bin/env bash
 # Parts 1, 2, 4, 5 verification script.
 # Run from ~/honeypot with venv active:
 #
@@ -7,7 +7,7 @@
 #   source venv/bin/activate
 #   bash scripts/verify_retrain.sh 2>&1 | tee /tmp/verify_output.txt
 #
-# Then: cat /tmp/verify_output.txt   (paste full output to Claude)
+# Then: cat /tmp/verify_output.txt   (paste full output to the analysis interface)
 
 set -euo pipefail
 SEP="========================================"
@@ -18,9 +18,9 @@ SHADOW="/var/log/honeypot/shadow_mode.csv"
 LIVE_LOG="/opt/zeek/logs/current/conn.log"
 ZEEK_ARCHIVE_DIR="/opt/zeek/logs"
 
-# ── Part 1a: Model freshness ───────────────────────────────────────────────────
+# â”€â”€ Part 1a: Model freshness â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 echo "$SEP"
-echo "PART 1a: MODEL FRESHNESS — mtime and SHA-256"
+echo "PART 1a: MODEL FRESHNESS â€” mtime and SHA-256"
 echo "$SEP"
 ls -la "$MODELS"/*.joblib 2>/dev/null || echo "No .joblib files found in $MODELS"
 echo ""
@@ -28,7 +28,7 @@ echo "SHA-256:"
 sha256sum "$MODELS"/*.joblib 2>/dev/null || echo "sha256sum failed"
 echo ""
 
-# ── Part 1b: Confirm eval_ch5 model paths ─────────────────────────────────────
+# â”€â”€ Part 1b: Confirm eval_ch5 model paths â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 echo "$SEP"
 echo "PART 1b: MODEL PATHS USED BY eval_ch5.py (runtime confirmation)"
 echo "$SEP"
@@ -53,7 +53,7 @@ for name, p in paths.items():
 PYEOF
 echo ""
 
-# ── Part 1c: Feature importances (new model; old overwritten) ─────────────────
+# â”€â”€ Part 1c: Feature importances (new model; old overwritten) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 echo "$SEP"
 echo "PART 1c: RF FEATURE IMPORTANCES (retrained model)"
 echo "$SEP"
@@ -73,7 +73,7 @@ importances = rf.feature_importances_
 ranked = sorted(zip(FEATURE_COLS, importances), key=lambda x: -x[1])
 print("Feature importance ranking (retrained model, corrected encoding):")
 for rank, (feat, imp) in enumerate(ranked, 1):
-    tag = " ← was dead (all-zero) before fix" if "conn_state" in feat else ""
+    tag = " â† was dead (all-zero) before fix" if "conn_state" in feat else ""
     print(f"  {rank:2}. {feat:<22} {imp:.5f}{tag}")
 
 print()
@@ -83,13 +83,13 @@ print(f"Conclusion: conn_state features {'ARE' if cs_total > 0 else 'ARE NOT'} c
 PYEOF
 echo ""
 
-# ── Part 1c note: old model gone ──────────────────────────────────────────────
+# â”€â”€ Part 1c note: old model gone â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 echo "NOTE: The old (pre-fix) model was overwritten by the retrain."
 echo "Direct before/after per-record agreement cannot be computed."
 echo "Evidence that the model changed: conn_state feature importances above (see PART 1c)."
 echo ""
 
-# ── Part 1d: Inference-time feature distribution ──────────────────────────────
+# â”€â”€ Part 1d: Inference-time feature distribution â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 echo "$SEP"
 echo "PART 1d: FEATURE DISTRIBUTION AT INFERENCE TIME (live Zeek records)"
 echo "$SEP"
@@ -149,9 +149,9 @@ for col in ["conn_state_S0", "conn_state_SF", "conn_state_REJ", "conn_state_RSTO
 PYEOF
 echo ""
 
-# ── Part 2: State coverage analysis ───────────────────────────────────────────
+# â”€â”€ Part 2: State coverage analysis â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 echo "$SEP"
-echo "PART 2: STATE COVERAGE — UNSW vs Live Zeek overlap"
+echo "PART 2: STATE COVERAGE â€” UNSW vs Live Zeek overlap"
 echo "$SEP"
 python3 - <<'PYEOF'
 import pandas as pd
@@ -161,7 +161,7 @@ import sys
 CSV = Path("data/raw/UNSW_NB15_training-set.CSV")
 LIVE = Path("/opt/zeek/logs/current/conn.log")
 
-# ── UNSW-NB15 ──
+# â”€â”€ UNSW-NB15 â”€â”€
 df = pd.read_csv(CSV, low_memory=False)
 df.columns = df.columns.str.strip().str.lower()
 from ml.features import UNSW_COL_MAP
@@ -178,13 +178,13 @@ MAP = {"REQ": "S0", "FIN": "SF", "CON": "SF", "CLO": "SF", "RST": "RSTO",
        "S0": "S0", "SF": "SF", "REJ": "REJ", "RSTO": "RSTO", "OTH": "OTH"}
 mapped = df["conn_state"].str.upper().map(MAP).fillna("")
 print()
-print("After Argus→Zeek mapping (conn_state_ columns):")
+print("After Argusâ†’Zeek mapping (conn_state_ columns):")
 for state in ("S0", "SF", "REJ", "RSTO", ""):
     cnt = (mapped == state).sum()
     label = state if state else "(unmapped/INT/ECO/etc)"
     print(f"  {label:<12} {cnt:>8,}  ({100*cnt/len(df):.2f}%)")
 
-# ── Live Zeek ──
+# â”€â”€ Live Zeek â”€â”€
 live_states = []
 with open(LIVE) as f:
     for line in f:
@@ -203,7 +203,7 @@ print("Live Zeek conn_state distribution:")
 for state, cnt in sorted(live_vc.items(), key=lambda x: -x[1]):
     print(f"  {state:<12} {cnt:>5,}  ({100*cnt/total_live:.1f}%)")
 
-# ── Overlap ──
+# â”€â”€ Overlap â”€â”€
 unsw_after_map = set(s for s in mapped.unique() if s)
 live_set = set(live_vc.keys())
 print()
@@ -224,12 +224,12 @@ print(f"Live records with state NOT in training:     {total_live-covered}/{total
 req_count = (df["conn_state"].str.upper() == "REQ").sum()
 s0_live = live_vc.get("S0", 0)
 print()
-print(f"UNSW REQ records (→ S0): {req_count:,}  ({100*req_count/len(df):.2f}% of training data)")
+print(f"UNSW REQ records (â†’ S0): {req_count:,}  ({100*req_count/len(df):.2f}% of training data)")
 print(f"Live S0 records:          {s0_live:,}  ({100*s0_live/total_live:.1f}% of live data)")
 PYEOF
 echo ""
 
-# ── Part 4a: Locate 432-record session in Zeek archives ───────────────────────
+# â”€â”€ Part 4a: Locate 432-record session in Zeek archives â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 echo "$SEP"
 echo "PART 4a: LOCATE 432-RECORD SESSION (looking for 2026-08-06 archive)"
 echo "$SEP"
@@ -262,7 +262,7 @@ else:
 PYEOF
 echo ""
 
-# ── Part 4b: IForest live model training set boundary ─────────────────────────
+# â”€â”€ Part 4b: IForest live model training set boundary â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 echo "$SEP"
 echo "PART 4b: IFOREST_LIVE TRAINING BOUNDARY AND HELD-OUT SET"
 echo "$SEP"
@@ -329,12 +329,12 @@ print(f"Total: {len(rows_train_window) + len(rows_held_out)}")
 # Note: the live IForest was trained on 345 Kali records from the train_window set
 train_kali = [r for r in rows_train_window if r["src_ip"] == "10.10.0.2"]
 print(f"\nKali records (10.10.0.2) in train window: {len(train_kali)}")
-print("(iforest_live was trained on 345 of these — using the 345 most recent Kali records)")
+print("(iforest_live was trained on 345 of these â€” using the 345 most recent Kali records)")
 
 PYEOF
 echo ""
 
-# ── Part 4c: Apples-to-apples IForest comparison ─────────────────────────────
+# â”€â”€ Part 4c: Apples-to-apples IForest comparison â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 echo "$SEP"
 echo "PART 4c: IFOREST COMPARISON (same population for both models)"
 echo "$SEP"
@@ -417,7 +417,7 @@ print(f"  Records after train boundary (held-out):          {len(df_held_out)}")
 print()
 
 # Full 1906-record population (clearly labelled as different session)
-print("=== FULL CURRENT LOG (1906-record set — different session from original 432) ===")
+print("=== FULL CURRENT LOG (1906-record set â€” different session from original 432) ===")
 for model, name in [(MODEL_UNSW, "UNSW-corrected"), (MODEL_LIVE, "Live-retrained")]:
     s = iforest_stats_on(model, df, name)
     print(f"  {name}: {s['below_-0.1']}/{s['n']} below -0.1 ({s['pct_below_-0.1']:.2f}%)")
@@ -449,7 +449,7 @@ else:
 PYEOF
 echo ""
 
-# ── Part 5: Ground-truth P/R on archived conn.log ─────────────────────────────
+# â”€â”€ Part 5: Ground-truth P/R on archived conn.log â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 echo "$SEP"
 echo "PART 5: GROUND-TRUTH P/R ON ZEEK CONN.LOG ARCHIVE (with Wilson CIs)"
 echo "$SEP"
@@ -573,8 +573,8 @@ def evaluate_iforest(model, X, gt, label, threshold=-0.1):
     rec_ci  = wilson_ci(TP, TP+FN)
     print(f"\n  {label}")
     print(f"    TP={TP}  FP={FP}  TN={TN}  FN={FN}")
-    print(f"    Precision: {prec:.3f}  [95% CI: {prec_ci[0]:.3f}–{prec_ci[1]:.3f}]  (n={TP+FP})")
-    print(f"    Recall:    {rec:.3f}  [95% CI: {rec_ci[0]:.3f}–{rec_ci[1]:.3f}]  (n={TP+FN})")
+    print(f"    Precision: {prec:.3f}  [95% CI: {prec_ci[0]:.3f}â€“{prec_ci[1]:.3f}]  (n={TP+FP})")
+    print(f"    Recall:    {rec:.3f}  [95% CI: {rec_ci[0]:.3f}â€“{rec_ci[1]:.3f}]  (n={TP+FN})")
     print(f"    F1:        {f1:.3f}")
     flag_rate = (TP+FP)/len(gt)
     print(f"    Flag rate: {TP+FP}/{len(gt)} ({100*flag_rate:.2f}%)")
@@ -595,5 +595,5 @@ PYEOF
 
 echo ""
 echo "$SEP"
-echo "DONE — paste full output above to Claude"
+echo "DONE â€” paste full output above to the analysis interface"
 echo "$SEP"

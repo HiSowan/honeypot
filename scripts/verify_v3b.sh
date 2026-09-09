@@ -1,5 +1,5 @@
-#!/usr/bin/env bash
-# verify_v3b.sh  —  Parts 2–5 continuation (Part 1 completed in verify_v3.sh)
+﻿#!/usr/bin/env bash
+# verify_v3b.sh  â€”  Parts 2â€“5 continuation (Part 1 completed in verify_v3.sh)
 #
 # Run from ~/honeypot with venv active:
 #   cd ~/honeypot
@@ -21,14 +21,14 @@ echo "$SEP"
 if [ -f "$SNAP" ]; then
     wc -l < "$SNAP" | xargs echo "  snapshot lines:"
 else
-    echo "  Snapshot missing — creating fresh one"
+    echo "  Snapshot missing â€” creating fresh one"
     cp /opt/zeek/logs/current/conn.log "$SNAP"
 fi
 echo ""
 
-# ── PART 2: UNSW-NB15 state column — complete value_counts and mapping ─────────
+# â”€â”€ PART 2: UNSW-NB15 state column â€” complete value_counts and mapping â”€â”€â”€â”€â”€â”€â”€â”€â”€
 echo "$SEP"
-echo "PART 2: UNSW-NB15 STATE COLUMN — value_counts, mapping coverage, all-zero %"
+echo "PART 2: UNSW-NB15 STATE COLUMN â€” value_counts, mapping coverage, all-zero %"
 echo "$SEP"
 python3 - <<'PYEOF'
 import pandas as pd
@@ -72,13 +72,13 @@ unmapped = all_values_in_data - mapped_values
 mapped_series = raw_states.map(MAP).fillna("")
 
 print()
-print("After current mapping — resulting conn_state distribution:")
+print("After current mapping â€” resulting conn_state distribution:")
 for state in ("S0", "SF", "REJ", "RSTO", ""):
     cnt = (mapped_series == state).sum()
     label = state if state else "(all-zero / unmapped)"
     note = ""
     if state == "REJ":
-        note = "  ← 0 UNSW records map here (only Zeek pass-through)"
+        note = "  â† 0 UNSW records map here (only Zeek pass-through)"
     print(f"  {label:<25} {cnt:>8,}  ({100*cnt/n:.4f}%){note}")
 
 all_zero_cnt = (mapped_series == "").sum()
@@ -92,31 +92,31 @@ print()
 print(f"Records with all-zero conn_state AFTER current mapping: {all_zero_cnt:,}  ({100*all_zero_cnt/n:.2f}%)")
 print()
 
-print("PROPOSED MAPPINGS for unhandled states (do not implement — proposals only):")
+print("PROPOSED MAPPINGS for unhandled states (do not implement â€” proposals only):")
 proposals = [
     ("INT", all_zero_cnt if "INT" in all_values_in_data else 0,
      "(leave all-zero)",
-     "Active/interrupted — connection open at capture boundary. Closest Zeek analogue is "
+     "Active/interrupted â€” connection open at capture boundary. Closest Zeek analogue is "
      "OTH (neither cleanly opened nor closed), but OTH is not in FEATURE_COLS. Forcing to "
      "SF would assert a clean close that did not occur. Recommend documenting as structurally "
      "unresolvable; all-zero conn_state is honest. INT represents 46.9% of training records "
      "and will remain the dominant all-zero contributor regardless of any other fix."),
     ("ECO", (raw_states == "ECO").sum(),
      "(leave all-zero)",
-     "ICMP echo — ICMP is already encoded by proto_icmp=1. Mapping ECO to a TCP-oriented "
+     "ICMP echo â€” ICMP is already encoded by proto_icmp=1. Mapping ECO to a TCP-oriented "
      "conn_state would mix protocol semantics. All-zero is correct; proto_icmp carries the signal."),
     ("PAR", (raw_states == "PAR").sum(),
      "(leave all-zero)",
-     "Partial connection — 1 record. No material impact on any metric. Leave as all-zero."),
+     "Partial connection â€” 1 record. No material impact on any metric. Leave as all-zero."),
     ("URN", (raw_states == "URN").sum(),
      "(leave all-zero)",
-     "Unresolved — 1 record. No clean Zeek analogue. Leave as all-zero."),
+     "Unresolved â€” 1 record. No clean Zeek analogue. Leave as all-zero."),
     ("NO",  (raw_states == "NO").sum(),
      "(leave all-zero)",
-     "Null/empty state — 1 record. Leave as all-zero."),
+     "Null/empty state â€” 1 record. Leave as all-zero."),
 ]
 for state, cnt, mapping, justification in proposals:
-    print(f"\n  {state} ({cnt:,} records) → {mapping}")
+    print(f"\n  {state} ({cnt:,} records) â†’ {mapping}")
     # wrap justification at 80 chars
     words = justification.split()
     line = "    "
@@ -133,13 +133,13 @@ print()
 resid = (raw_states == "INT").sum() if "INT" in all_values_in_data else 0
 print(f"If proposals adopted: all-zero count remains {all_zero_cnt:,} ({100*all_zero_cnt/n:.2f}%)")
 print(f"INT is the sole material contributor ({resid:,} records = {100*resid/n:.2f}%).")
-print(f"The other unhandled states sum to {all_zero_cnt - resid:,} records — negligible.")
+print(f"The other unhandled states sum to {all_zero_cnt - resid:,} records â€” negligible.")
 PYEOF
 echo ""
 
-# ── PART 3: State coverage — recomputed from archive attack records ────────────
+# â”€â”€ PART 3: State coverage â€” recomputed from archive attack records â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 echo "$SEP"
-echo "PART 3: STATE COVERAGE — from 1,544 archive attack records"
+echo "PART 3: STATE COVERAGE â€” from 1,544 archive attack records"
 echo "$SEP"
 python3 - <<PYEOF
 import gzip, sys
@@ -209,9 +209,9 @@ for state, cnt in sorted(attack_states.items(), key=lambda x: -x[1]):
     if state in TRAIN_EXAMPLES:
         status = "IN TRAINING (examples > 0)"
     elif state in FEATURE_COLS_STATES:
-        status = "FEATURE COL EXISTS — 0 training examples (inference-alive, training-dead)"
+        status = "FEATURE COL EXISTS â€” 0 training examples (inference-alive, training-dead)"
     else:
-        status = "NOT in FEATURE_COLS → all-zero at inference"
+        status = "NOT in FEATURE_COLS â†’ all-zero at inference"
     print(f"  {state or '(empty)':<10} {cnt:>7,}  {100*cnt/attack_n:>5.1f}%  {status}")
 
 # Coverage
@@ -221,7 +221,7 @@ no_repr     = attack_n - in_training
 print()
 print("=== COVERAGE ===")
 print(f"Training vocab with >0 examples: {sorted(TRAIN_EXAMPLES)}")
-print(f"  (REJ is a FEATURE_COL but has 0 training examples — not counted as 'represented')")
+print(f"  (REJ is a FEATURE_COL but has 0 training examples â€” not counted as 'represented')")
 print()
 print(f"Attack records with state in training vocab: {in_training:,}  ({100*in_training/attack_n:.1f}%)")
 for s in TRAIN_EXAMPLES:
@@ -235,23 +235,23 @@ print("Breakdown of unrepresented attack records:")
 for state, cnt in sorted(attack_states.items(), key=lambda x: -x[1]):
     if state not in TRAIN_EXAMPLES:
         if state in FEATURE_COLS_STATES:
-            note = "feature fires at inference; 0 training examples → model cannot use it"
+            note = "feature fires at inference; 0 training examples â†’ model cannot use it"
         else:
             note = "all-zero at inference (state not in FEATURE_COLS)"
         print(f"  {state or '(empty)':<10} {cnt:>6,}  ({100*cnt/attack_n:.1f}%)  [{note}]")
 print()
 print(f"==> {pct_no:.1f}% of live attack records have no training representation")
 if abs(pct_no - 86.8) < 1.0:
-    print(f"    User predicted 86.8% — CONFIRMED (within 1%)")
+    print(f"    User predicted 86.8% â€” CONFIRMED (within 1%)")
 else:
-    print(f"    User predicted 86.8% — ACTUAL: {pct_no:.1f}%")
+    print(f"    User predicted 86.8% â€” ACTUAL: {pct_no:.1f}%")
 print()
 print("Note: previous round's '0% overlap' was computed on a 499-record background-only")
 print("log containing zero Kali records. That figure is void and must not appear in the thesis.")
 PYEOF
 echo ""
 
-# ── PART 4: Canonical count ────────────────────────────────────────────────────
+# â”€â”€ PART 4: Canonical count â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 echo "$SEP"
 echo "PART 4: CANONICAL RECORD COUNT"
 echo "$SEP"
@@ -323,7 +323,7 @@ print(f"    Non-allowlisted bg:       {excl_bg:>7,}")
 print(f"  Allowlist-excluded total:   {excl_total:>7,}")
 print(f"  Allowlist-excluded base rate: {100*attack/excl_total:.2f}%")
 print()
-print(f"verify_v3.sh Part 1 reported 35,375 — this run reports {total}.")
+print(f"verify_v3.sh Part 1 reported 35,375 â€” this run reports {total}.")
 diff = total - 35375
 if diff == 0:
     print("  Counts match.")
@@ -333,7 +333,7 @@ else:
 PYEOF
 echo ""
 
-# ── PART 5: Clean held-out IForest evaluation ─────────────────────────────────
+# â”€â”€ PART 5: Clean held-out IForest evaluation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 echo "$SEP"
 echo "PART 5: CLEAN HELD-OUT IFOREST EVALUATION"
 echo "$SEP"
@@ -447,7 +447,7 @@ print(f"  Held-out positives: {n_test_atk:,}")
 # CI width check
 z = 1.96
 ci_half_at_half = z * (0.5/n_test_atk**0.5)
-print(f"  Wilson CI half-width at P=0.5, n={n_test_atk}: {ci_half_at_half:.3f}  ({'OK' if ci_half_at_half < 0.05 else 'marginal — check CIs on actual results'})")
+print(f"  Wilson CI half-width at P=0.5, n={n_test_atk}: {ci_half_at_half:.3f}  ({'OK' if ci_half_at_half < 0.05 else 'marginal â€” check CIs on actual results'})")
 print()
 
 # Train new IForest
@@ -508,8 +508,8 @@ def eval_on(model, test_atk_idx, bg_src_filter, label):
     print(f"  {label}")
     print(f"    n={len(y_e):,}  attack={y_e.sum():,} ({base:.2f}%)")
     print(f"    TP={TP}  FP={FP}  TN={TN}  FN={FN}")
-    print(f"    Precision: {P:.3f}  [95% CI: {Pci[0]:.3f}–{Pci[1]:.3f}]  (n={TP+FP})")
-    print(f"    Recall:    {R:.3f}  [95% CI: {Rci[0]:.3f}–{Rci[1]:.3f}]  (n={TP+FN})")
+    print(f"    Precision: {P:.3f}  [95% CI: {Pci[0]:.3f}â€“{Pci[1]:.3f}]  (n={TP+FP})")
+    print(f"    Recall:    {R:.3f}  [95% CI: {Rci[0]:.3f}â€“{Rci[1]:.3f}]  (n={TP+FN})")
     print(f"    F1:        {F:.3f}")
     print(f"    Flag rate: {TP+FP}/{len(y_e)} ({100*(TP+FP)/len(y_e):.2f}%)")
     # FP breakdown
@@ -539,5 +539,5 @@ PYEOF
 
 echo ""
 echo "$SEP"
-echo "DONE — paste full output to Claude"
+echo "DONE â€” paste full output to the analysis interface"
 echo "$SEP"

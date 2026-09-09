@@ -1,4 +1,4 @@
-"""Phase 1 vs Phase 2 port-exposure experiment.
+﻿"""Phase 1 vs Phase 2 port-exposure experiment.
 
 Demonstrates the adaptive rotation mechanism by:
 1. Applying Phase 1 iptables rules (all allow-list ports ACCEPT)
@@ -9,17 +9,17 @@ Uses an isolated iptables chain (HONEYPOT_EXP) so existing rules are untouched.
 
 Usage (run as root or with sudo, from ~/honeypot with venv active):
 
-  Step 1 — set up Phase 1:
+  Step 1 â€” set up Phase 1:
       sudo python ml/eval_phase_compare.py --setup-phase1
 
-  [Run nmap from Kali — see kali_scan.sh]
+  [Run nmap from Kali â€” see kali_scan.sh]
 
-  Step 2 — simulate Phase 2 rotation (controller detected scan of ports 22,80):
+  Step 2 â€” simulate Phase 2 rotation (controller detected scan of ports 22,80):
       sudo python ml/eval_phase_compare.py --rotate --probed 22,80
 
   [Run nmap from Kali again]
 
-  Step 3 — print comparison report:
+  Step 3 â€” print comparison report:
       sudo python ml/eval_phase_compare.py --report
 
   Cleanup:
@@ -31,12 +31,12 @@ import sys
 import time
 from pathlib import Path
 
-# ── Allow-list (Phase 1 static ports, from CLAUDE.md) ────────────────────
+# â”€â”€ Allow-list (Phase 1 static ports, from config) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 PHASE1_PORTS = [21, 22, 23, 25, 80, 443, 445]
 EXP_CHAIN    = "HONEYPOT_EXP"
 SNAPSHOT_DIR = Path("/tmp/honeypot_exp")
 
-# ── iptables helpers ──────────────────────────────────────────────────────
+# â”€â”€ iptables helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def run_ipt(*args, check=True):
     cmd = ["iptables"] + list(args)
@@ -103,10 +103,10 @@ def parse_ports_from_snapshot(text):
     return result
 
 
-# ── Commands ──────────────────────────────────────────────────────────────
+# â”€â”€ Commands â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def cmd_setup_phase1():
-    print("=== PHASE 1 SETUP — all allow-list ports ACCEPT ===")
+    print("=== PHASE 1 SETUP â€” all allow-list ports ACCEPT ===")
     ensure_chain()
     flush_chain()
     for port in PHASE1_PORTS:
@@ -122,16 +122,16 @@ def cmd_setup_phase1():
 
 def cmd_rotate(probed_str):
     probed = set(int(p) for p in probed_str.split(","))
-    print(f"=== PHASE 2 ROTATION — scanner probed ports: {sorted(probed)} ===")
+    print(f"=== PHASE 2 ROTATION â€” scanner probed ports: {sorted(probed)} ===")
     ensure_chain()
     flush_chain()
     for port in PHASE1_PORTS:
         if port in probed:
             drop_port(port)
-            print(f"  DROP  port {port}/tcp  (already probed — hiding from attacker)")
+            print(f"  DROP  port {port}/tcp  (already probed â€” hiding from attacker)")
         else:
             open_port(port)
-            print(f"  ACCEPT port {port}/tcp  (unprobed — keeping visible)")
+            print(f"  ACCEPT port {port}/tcp  (unprobed â€” keeping visible)")
     state = snapshot_state("phase2")
     print()
     print(state)
@@ -161,10 +161,10 @@ def cmd_report():
     all_ports = sorted(set(p1) | set(p2))
     hidden, revealed, stable = [], [], []
     for port in all_ports:
-        v1 = p1.get(port, "—")
-        v2 = p2.get(port, "—")
+        v1 = p1.get(port, "â€”")
+        v2 = p2.get(port, "â€”")
         if v1 == "ACCEPT" and v2 == "DROP":
-            change = "HIDDEN (probed → rotated away)"
+            change = "HIDDEN (probed â†’ rotated away)"
             hidden.append(port)
         elif v1 == "DROP" and v2 == "ACCEPT":
             change = "REVEALED"
@@ -173,7 +173,7 @@ def cmd_report():
             change = "unchanged"
             stable.append(port)
         else:
-            change = f"{v1} → {v2}"
+            change = f"{v1} â†’ {v2}"
         print(f"{port:<8} {v1:^12} {v2:^12} {change}")
 
     print()
@@ -182,7 +182,7 @@ def cmd_report():
     print("=" * 65)
     print(f"Ports visible in Phase 1 : {sorted(p for p,v in p1.items() if v=='ACCEPT')}")
     print(f"Ports visible in Phase 2 : {sorted(p for p,v in p2.items() if v=='ACCEPT')}")
-    print(f"Ports hidden after rotation : {hidden}  (DROP — scanner probed these)")
+    print(f"Ports hidden after rotation : {hidden}  (DROP â€” scanner probed these)")
     print(f"Ports newly visible after rotation : {revealed}")
     print()
     overlap = set(p for p,v in p1.items() if v=='ACCEPT') & \
@@ -190,7 +190,7 @@ def cmd_report():
     p1_acc  = set(p for p,v in p1.items() if v=='ACCEPT')
     p2_acc  = set(p for p,v in p2.items() if v=='ACCEPT')
     pct = 100*len(overlap)/len(p1_acc) if p1_acc else 0
-    print(f"Port-set overlap (Phase1 ∩ Phase2) / Phase1 : "
+    print(f"Port-set overlap (Phase1 âˆ© Phase2) / Phase1 : "
           f"{len(overlap)}/{len(p1_acc)} = {pct:.0f}%")
     print()
     print("INTERPRETATION")
@@ -199,12 +199,12 @@ def cmd_report():
     print(f"will find {sorted(p2_acc)} on the next scan after rotation.")
     print(f"{len(hidden)} port(s) that were scanned are now hidden.")
     if revealed:
-        print(f"{len(revealed)} port(s) that were not yet scanned are now exposed —")
+        print(f"{len(revealed)} port(s) that were not yet scanned are now exposed â€”")
         print("  attacker must probe again to find them, generating more log data.")
     print()
     print("Moving-target effect: port set is unpredictable across scans.")
-    print("Attack surface enumeration requires repeated reconnaissance → "
-          "more Zeek log entries → higher detection probability.")
+    print("Attack surface enumeration requires repeated reconnaissance â†’ "
+          "more Zeek log entries â†’ higher detection probability.")
 
     # Save report
     report_path = SNAPSHOT_DIR / "phase_comparison_report.txt"
@@ -221,8 +221,8 @@ def cmd_report_inner(p1, p2, hidden, revealed, overlap, p1_acc, p2_acc):
     print("Phase 1 vs Phase 2 Port Exposure Comparison")
     print()
     for port in all_ports:
-        v1 = p1.get(port, "—"); v2 = p2.get(port, "—")
-        print(f"  Port {port}: {v1} → {v2}")
+        v1 = p1.get(port, "â€”"); v2 = p2.get(port, "â€”")
+        print(f"  Port {port}: {v1} â†’ {v2}")
     print()
     pct = 100*len(overlap)/len(p1_acc) if p1_acc else 0
     print(f"Phase 1 visible: {sorted(p1_acc)}")
@@ -234,10 +234,10 @@ def cmd_report_inner(p1, p2, hidden, revealed, overlap, p1_acc, p2_acc):
 
 def cmd_cleanup():
     remove_chain()
-    print("HONEYPOT_EXP chain removed — iptables restored to pre-experiment state.")
+    print("HONEYPOT_EXP chain removed â€” iptables restored to pre-experiment state.")
 
 
-# ── Entry point ───────────────────────────────────────────────────────────
+# â”€â”€ Entry point â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 if __name__ == "__main__":
     p = argparse.ArgumentParser(description="Phase 1 vs Phase 2 port exposure experiment")
     g = p.add_mutually_exclusive_group(required=True)

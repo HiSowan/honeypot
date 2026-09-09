@@ -6,7 +6,7 @@
 #   source venv/bin/activate
 #   bash scripts/collect_part_a.sh 2>&1 | tee /tmp/part_a_output.txt
 #
-# Then: cat /tmp/part_a_output.txt  (paste full output to Claude)
+# Then: cat /tmp/part_a_output.txt  (paste full output to the analysis interface)
 
 set -euo pipefail
 SEP="========================================"
@@ -133,5 +133,5 @@ PYEOF
 
 echo ""
 echo "$SEP"
-echo "DONE — paste the full output above to Claude"
+echo "DONE — paste the full output above to the analysis interface"
 echo "$SEP"

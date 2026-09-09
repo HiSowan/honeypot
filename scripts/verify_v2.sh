@@ -1,5 +1,5 @@
-#!/usr/bin/env bash
-# Parts 1, 2, 3 (diagnostics), 5, 6 verification script — v2
+﻿#!/usr/bin/env bash
+# Parts 1, 2, 3 (diagnostics), 5, 6 verification script â€” v2
 # Part 4 (mapping test) is handled separately from the code.
 #
 # Run from ~/honeypot with venv active:
@@ -9,7 +9,7 @@
 #   source venv/bin/activate
 #   bash scripts/verify_v2.sh 2>&1 | tee /tmp/verify_v2_output.txt
 #
-# Then: cat /tmp/verify_v2_output.txt   (paste full output to Claude)
+# Then: cat /tmp/verify_v2_output.txt   (paste full output to the analysis interface)
 
 set -euo pipefail
 SEP="========================================"
@@ -17,7 +17,7 @@ ARCHIVE_DIR="/opt/zeek/logs"
 MODELS="ml/models"
 TODAY=$(date +%Y-%m-%d)
 
-# ── Backup all .joblib models before anything else ────────────────────────────
+# â”€â”€ Backup all .joblib models before anything else â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 echo "$SEP"
 echo "PRECAUTION: Backing up .joblib files to $MODELS/archive/$TODAY/"
 echo "$SEP"
@@ -27,9 +27,9 @@ for f in "$MODELS"/*.joblib; do
 done
 echo ""
 
-# ── PART 1: Dedup collision analysis ──────────────────────────────────────────
+# â”€â”€ PART 1: Dedup collision analysis â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 echo "$SEP"
-echo "PART 1: DEDUP COLLISION ANALYSIS — raw vs uid-deduped populations"
+echo "PART 1: DEDUP COLLISION ANALYSIS â€” raw vs uid-deduped populations"
 echo "$SEP"
 python3 - <<'PYEOF'
 import gzip, os, sys
@@ -72,7 +72,7 @@ current = ARCHIVE_DIR / "current" / "conn.log"
 print(f"Archive log files (excluding current): {len(all_logs)}")
 print()
 
-# ── Step 1: raw count (no dedup) ──────────────────────────────────────────────
+# â”€â”€ Step 1: raw count (no dedup) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 raw_total = 0
 raw_by_src = Counter()
 ts_srcip_keys = set()
@@ -125,7 +125,7 @@ for ip, cnt in ts_srcip_collisions_by_src.most_common(15):
     print(f"  {ip:<45} {cnt:>7,}  ({pct_of_raw:.1f}% of that IP's raw records)")
 print()
 
-# ── Step 2: uid-based dedup ───────────────────────────────────────────────────
+# â”€â”€ Step 2: uid-based dedup â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 uid_seen = set()
 uid_dedup_total = 0
 uid_dedup_by_src = Counter()
@@ -182,10 +182,10 @@ for ip, cnt in uid_dedup_by_src.most_common(10):
     print(f"  {ip:<45} {cnt:>7,}")
 print()
 
-# ── Step 3: reconciliation with thesis Table 5.2 ──────────────────────────────
+# â”€â”€ Step 3: reconciliation with thesis Table 5.2 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 print("=== RECONCILIATION ===")
-print("Previous Part 5 raw:     34,133 total → 291 attack (0.95%)  [WRONG: (ts,src_ip) dedup]")
-print(f"Corrected uid-dedup:    {uid_dedup_total:>6,} total → {uid_attack} attack ({100*uid_attack/uid_dedup_total:.2f}%)")
+print("Previous Part 5 raw:     34,133 total â†’ 291 attack (0.95%)  [WRONG: (ts,src_ip) dedup]")
+print(f"Corrected uid-dedup:    {uid_dedup_total:>6,} total â†’ {uid_attack} attack ({100*uid_attack/uid_dedup_total:.2f}%)")
 print()
 print("What Table 5.2 should say:")
 print(f"  Archive total (uid-dedup): {uid_dedup_total:,}")
@@ -195,9 +195,9 @@ print(f"  Attack base rate:          {100*uid_attack/uid_dedup_total:.2f}%")
 PYEOF
 echo ""
 
-# ── PART 2: conn_state distribution on attack vs background records ───────────
+# â”€â”€ PART 2: conn_state distribution on attack vs background records â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 echo "$SEP"
-echo "PART 2: conn_state DISTRIBUTION — archive attack vs background records"
+echo "PART 2: conn_state DISTRIBUTION â€” archive attack vs background records"
 echo "$SEP"
 python3 - <<'PYEOF'
 import gzip, sys
@@ -268,7 +268,7 @@ if attack_n:
     for state, cnt in sorted(attack_states.items(), key=lambda x: -x[1]):
         print(f"  {state or '(empty)':<12}  {cnt:>6,}  ({100*cnt/attack_n:.1f}%)")
     s0_pct = 100 * attack_states.get("S0", 0) / attack_n
-    print(f"\n  S0 (SYN, no reply — expected for nmap SYN scan): {attack_states.get('S0',0):,}  ({s0_pct:.1f}%)")
+    print(f"\n  S0 (SYN, no reply â€” expected for nmap SYN scan): {attack_states.get('S0',0):,}  ({s0_pct:.1f}%)")
 else:
     print("  NO ATTACK RECORDS FOUND")
 
@@ -280,7 +280,7 @@ if bg_n:
         print(f"  {state or '(empty)':<12}  {cnt:>6,}  ({100*cnt/bg_n:.1f}%)")
 
 print()
-# The thesis claim in §5.2.1 and §6.4.1
+# The thesis claim in Â§5.2.1 and Â§6.4.1
 if attack_n:
     s0_count = attack_states.get("S0", 0)
     if s0_count > attack_n * 0.5:
@@ -291,13 +291,13 @@ if attack_n:
         oth_count = attack_states.get("OTH", 0) + attack_states.get("RSTRH", 0) + attack_states.get("SHR", 0)
         print("VERDICT: Attack records are NOT S0-dominant.")
         print(f"  Originator-blind states (OTH+RSTRH+SHR) = {oth_count}/{attack_n} ({100*oth_count/attack_n:.1f}%)")
-        print("  This indicates a Zeek capture defect — Zeek is not seeing the originator direction.")
+        print("  This indicates a Zeek capture defect â€” Zeek is not seeing the originator direction.")
         print("  Proceed to Part 3 for capture diagnosis.")
         print("  The thesis text claiming conn_state_S0 for nmap SYN traffic is INCORRECT.")
 PYEOF
 echo ""
 
-# ── PART 3: Zeek capture diagnostics ──────────────────────────────────────────
+# â”€â”€ PART 3: Zeek capture diagnostics â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 echo "$SEP"
 echo "PART 3: ZEEK CAPTURE DIAGNOSTICS"
 echo "$SEP"
@@ -325,9 +325,9 @@ grep -r "interface\|enp0s3" /etc/systemd/system/ 2>/dev/null | head -10 || echo 
 systemctl cat zeek 2>/dev/null | grep -i "interface\|enp0s3" || echo "  zeekctl systemd unit: not found or no interface config"
 echo ""
 
-# ── PART 5: Ground-truth P/R with uid dedup ───────────────────────────────────
+# â”€â”€ PART 5: Ground-truth P/R with uid dedup â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 echo "$SEP"
-echo "PART 5: GROUND-TRUTH P/R — uid-deduped archive, both IForest models"
+echo "PART 5: GROUND-TRUTH P/R â€” uid-deduped archive, both IForest models"
 echo "$SEP"
 python3 - <<'PYEOF'
 import gzip, sys
@@ -452,8 +452,8 @@ def eval_iforest(model, X, y, label, threshold=-0.1):
     R_ci = wilson_ci(TP, TP+FN)
     print(f"  {label}")
     print(f"    TP={TP}  FP={FP}  TN={TN}  FN={FN}")
-    print(f"    Precision: {P:.3f}  [95% CI: {P_ci[0]:.3f}–{P_ci[1]:.3f}]  (denominator n={TP+FP})")
-    print(f"    Recall:    {R:.3f}  [95% CI: {R_ci[0]:.3f}–{R_ci[1]:.3f}]  (denominator n={TP+FN}={n_pos})")
+    print(f"    Precision: {P:.3f}  [95% CI: {P_ci[0]:.3f}â€“{P_ci[1]:.3f}]  (denominator n={TP+FP})")
+    print(f"    Recall:    {R:.3f}  [95% CI: {R_ci[0]:.3f}â€“{R_ci[1]:.3f}]  (denominator n={TP+FN}={n_pos})")
     print(f"    F1:        {F1:.3f}")
     print(f"    Flag rate: {TP+FP}/{n} ({100*(TP+FP)/n:.2f}%)")
     print()
@@ -475,11 +475,11 @@ print()
 print(f"RF records classified as non-Normal: {rf_attack_pred:,}")
 print(f"Actual attack records:               {actual_attack:,}")
 if actual_attack > 0:
-    print(f"RF sensitivity on attack class:      {100*rf_attack_pred/actual_attack:.1f}% (upper bound — assumes all non-Normal are TP)")
+    print(f"RF sensitivity on attack class:      {100*rf_attack_pred/actual_attack:.1f}% (upper bound â€” assumes all non-Normal are TP)")
 PYEOF
 echo ""
 
-# ── PART 6: Held-out IForest evaluation ───────────────────────────────────────
+# â”€â”€ PART 6: Held-out IForest evaluation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 echo "$SEP"
 echo "PART 6: IDENTIFY IFOREST_LIVE TRAINING RECORDS + HELD-OUT EVALUATION"
 echo "$SEP"
@@ -625,7 +625,7 @@ if n_ho_attack == 0:
     print()
     print("Falling back: evaluating both models on TRAIN WINDOW records (in-sample for live model only).")
     eval_set = train_rows
-    eval_label = "TRAIN WINDOW (in-sample — lower-bound measure)"
+    eval_label = "TRAIN WINDOW (in-sample â€” lower-bound measure)"
 else:
     eval_set = held_out_rows
     eval_label = "HELD-OUT SET (out-of-sample)"
@@ -665,13 +665,13 @@ else:
         R_ci = wilson_ci(TP, TP+FN)
         print(f"  {mname}")
         print(f"    TP={TP}  FP={FP}  TN={TN}  FN={FN}")
-        print(f"    Precision: {P:.3f}  [95% CI: {P_ci[0]:.3f}–{P_ci[1]:.3f}]  (n={TP+FP})")
-        print(f"    Recall:    {R:.3f}  [95% CI: {R_ci[0]:.3f}–{R_ci[1]:.3f}]  (n={TP+FN})")
+        print(f"    Precision: {P:.3f}  [95% CI: {P_ci[0]:.3f}â€“{P_ci[1]:.3f}]  (n={TP+FP})")
+        print(f"    Recall:    {R:.3f}  [95% CI: {R_ci[0]:.3f}â€“{R_ci[1]:.3f}]  (n={TP+FN})")
         print(f"    F1:        {F1:.3f}")
         print(f"    Flag rate: {TP+FP}/{n_e} ({100*(TP+FP)/n_e:.2f}%)")
         print()
 PYEOF
 echo ""
 echo "$SEP"
-echo "DONE — paste full output to Claude"
+echo "DONE â€” paste full output to the analysis interface"
 echo "$SEP"

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Collect all data needed for thesis D1 placeholders.
 # Run on the Ubuntu VM: bash scripts/collect_d1_data.sh
-# Paste the entire output back to Claude.
+# Paste the entire output into the analysis interface.
 
 set -euo pipefail
 
