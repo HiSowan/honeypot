@@ -1,7 +1,7 @@
 """Build the evidence-led tracked Phase B thesis successor.
 
 The source is never modified. Existing revisions, fields and media are preserved;
-all new prose is attributed to the AI assistant and every change is located by accepted text.
+all new prose is attributed to the author and every change is located by accepted text.
 """
 from __future__ import annotations
 

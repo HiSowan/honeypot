@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+﻿#!/usr/bin/env bash
 # Part A / C / D data collection for thesis retraining round.
 # Run from ~/honeypot with venv active:
 #
@@ -6,12 +6,12 @@
 #   source venv/bin/activate
 #   bash scripts/collect_part_a.sh 2>&1 | tee /tmp/part_a_output.txt
 #
-# Then: cat /tmp/part_a_output.txt  (paste full output to the analysis interface)
+# Then: cat /tmp/part_a_output.txt  (paste full output)
 
 set -euo pipefail
 SEP="========================================"
 
-# ── Part D: exact versions ────────────────────────────────────────────────────
+# â”€â”€ Part D: exact versions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 echo "$SEP"
 echo "SECTION: VERSIONS"
 echo "$SEP"
@@ -20,7 +20,7 @@ echo "promtail:            $(/opt/promtail/promtail --version 2>&1 | head -1)"
 echo "iptables-persistent: $(dpkg -l iptables-persistent 2>/dev/null | awk '/^ii/{print $3}' || echo 'NOT INSTALLED')"
 echo ""
 
-# ── Part A: Encoding verification ─────────────────────────────────────────────
+# â”€â”€ Part A: Encoding verification â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 echo "$SEP"
 echo "SECTION: ENCODING VERIFICATION (conn_state value_counts before/after fix)"
 echo "$SEP"
@@ -30,7 +30,7 @@ from pathlib import Path
 
 CSV = Path("data/raw/UNSW_NB15_training-set.CSV")
 if not CSV.exists():
-    print(f"ERROR: {CSV} not found — retraining cannot proceed")
+    print(f"ERROR: {CSV} not found â€” retraining cannot proceed")
     sys.exit(1)
 
 df = pd.read_csv(CSV, low_memory=False)
@@ -45,14 +45,14 @@ print(f"Total records: {len(df):,}")
 print(f"\nRaw conn_state value_counts (top 12):")
 print(df["conn_state"].str.upper().value_counts().head(12).to_string())
 
-# ─ BEFORE: no mapping (what old preprocess.py did) ─
+# â”€ BEFORE: no mapping (what old preprocess.py did) â”€
 print("\n=== BEFORE fix (Zeek vocab applied directly to Argus values) ===")
 for state in ("S0", "SF", "REJ", "RSTO"):
     col = (df["conn_state"].str.upper() == state).astype(int)
     print(f"  conn_state_{state}: sum={col.sum():,}  (all zero? {col.sum()==0})")
 
-# ─ AFTER: with Argus→Zeek mapping ─
-print("\n=== AFTER fix (Argus→Zeek map applied first) ===")
+# â”€ AFTER: with Argusâ†’Zeek mapping â”€
+print("\n=== AFTER fix (Argusâ†’Zeek map applied first) ===")
 MAP = {"REQ": "S0", "FIN": "SF", "CON": "SF", "CLO": "SF", "RST": "RSTO"}
 mapped = df["conn_state"].str.upper().map(MAP).fillna("")
 for state in ("S0", "SF", "REJ", "RSTO"):
@@ -62,28 +62,28 @@ PYEOF
 
 echo ""
 
-# ── Part A: Retrain RF ────────────────────────────────────────────────────────
+# â”€â”€ Part A: Retrain RF â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 echo "$SEP"
 echo "SECTION: RETRAIN RANDOM FOREST"
 echo "$SEP"
 python3 -m ml.train_rf data/raw/UNSW_NB15_training-set.CSV
 echo ""
 
-# ── Part A: Retrain UNSW IForest baseline ─────────────────────────────────────
+# â”€â”€ Part A: Retrain UNSW IForest baseline â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 echo "$SEP"
 echo "SECTION: RETRAIN IFOREST (UNSW-NB15 baseline)"
 echo "$SEP"
 python3 -m ml.train_iforest data/raw/UNSW_NB15_training-set.CSV
 echo ""
 
-# ── Part A: Full eval ─────────────────────────────────────────────────────────
+# â”€â”€ Part A: Full eval â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 echo "$SEP"
 echo "SECTION: EVAL_CH5 (full evaluation)"
 echo "$SEP"
 python3 ml/eval_ch5.py
 echo ""
 
-# ── Part C: Shadow mode recompute ─────────────────────────────────────────────
+# â”€â”€ Part C: Shadow mode recompute â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 echo "$SEP"
 echo "SECTION: SHADOW_MODE.CSV RECOMPUTE (Part C)"
 echo "$SEP"
@@ -133,5 +133,5 @@ PYEOF
 
 echo ""
 echo "$SEP"
-echo "DONE — paste the full output above to the analysis interface"
+echo "DONE â€” paste the full output above"
 echo "$SEP"

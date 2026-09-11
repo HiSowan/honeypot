@@ -10,7 +10,7 @@ from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 from docx.text.paragraph import Paragraph
 
-AUTHOR = "AI assistant"
+AUTHOR = "Author"
 DATE = datetime(2026, 9, 7, tzinfo=timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 _counter = [9000]

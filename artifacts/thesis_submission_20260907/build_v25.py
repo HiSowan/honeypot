@@ -1,4 +1,4 @@
-"""Build the submission copy from the AI-generated revised draft in one pass.
+"""Build the submission copy from the revised draft in one pass.
 
 All edits are located by matching text, never by fixed paragraph index, so the
 script is order-independent and re-runnable. Nothing in a protected section

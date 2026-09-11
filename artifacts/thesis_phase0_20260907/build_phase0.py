@@ -2,7 +2,7 @@
 
 The builder edits OOXML directly so existing revisions, fields, images,
 bookmarks and package parts survive byte-for-byte except document.xml and
-settings.xml. New content changes are attributed to the AI assistant.
+settings.xml. New content changes are attributed to the author.
 """
 
 from __future__ import annotations
@@ -23,7 +23,7 @@ from lxml import etree
 NS = {"w": "http://schemas.openxmlformats.org/wordprocessingml/2006/main"}
 W = "{%s}" % NS["w"]
 XML_SPACE = "{http://www.w3.org/XML/1998/namespace}space"
-AUTHOR = "AI assistant"
+AUTHOR = "Author"
 DATE = datetime(2026, 9, 7, tzinfo=timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 

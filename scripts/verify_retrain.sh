@@ -7,7 +7,7 @@
 #   source venv/bin/activate
 #   bash scripts/verify_retrain.sh 2>&1 | tee /tmp/verify_output.txt
 #
-# Then: cat /tmp/verify_output.txt   (paste full output to the analysis interface)
+# Then: cat /tmp/verify_output.txt   (paste full output)
 
 set -euo pipefail
 SEP="========================================"
@@ -595,5 +595,5 @@ PYEOF
 
 echo ""
 echo "$SEP"
-echo "DONE â€” paste full output above to the analysis interface"
+echo "DONE â€” paste full output above"
 echo "$SEP"

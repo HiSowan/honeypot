@@ -539,5 +539,5 @@ PYEOF
 
 echo ""
 echo "$SEP"
-echo "DONE â€” paste full output to the analysis interface"
+echo "DONE â€” paste full output"
 echo "$SEP"

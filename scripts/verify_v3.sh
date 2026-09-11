@@ -688,5 +688,5 @@ eval_on(clf,         test_attack_idx, bg_idx, "New live IForest (allowlist-excl)
 PYEOF
 echo ""
 echo "$SEP"
-echo "DONE â€” paste full output to the analysis interface"
+echo "DONE â€” paste full output"
 echo "$SEP"

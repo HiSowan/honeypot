@@ -9,7 +9,7 @@
 #   source venv/bin/activate
 #   bash scripts/verify_v2.sh 2>&1 | tee /tmp/verify_v2_output.txt
 #
-# Then: cat /tmp/verify_v2_output.txt   (paste full output to the analysis interface)
+# Then: cat /tmp/verify_v2_output.txt   (paste full output)
 
 set -euo pipefail
 SEP="========================================"
@@ -673,5 +673,5 @@ else:
 PYEOF
 echo ""
 echo "$SEP"
-echo "DONE â€” paste full output to the analysis interface"
+echo "DONE â€” paste full output"
 echo "$SEP"
