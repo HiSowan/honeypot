@@ -1,0 +1,260 @@
+﻿{
+  "status": "phase0_complete_awaiting_user_go_ahead",
+  "source": "D:\\Claude\\honeypot\\artifacts\\thesis_submission_20260907\\thesis_v26_tracked.docx",
+  "source_sha256": "22fc857bbfb1e742ff188ad00a50dfb25a67f99b50a9e5dd8fb24de13868f11f",
+  "output": "D:\\Claude\\honeypot\\artifacts\\thesis_phase0_20260907\\thesis_v27_phase0_tracked.docx",
+  "output_sha256": "64fc8186e38c7fd9f68e11779ba19d69f9245f8558b32b1b3f1b5fb94348096b",
+  "author": "Author",
+  "changes": [
+    {
+      "label": "0.1 reference \u2014 Davis and Goadrich (2006)",
+      "old": "",
+      "new": "Davis, J., & Goadrich, M. (2006). The relationship between Precision-Recall and ROC curves. In Proceedings of the 23rd International Conference on Machine Learning (ICML '06) (pp. 233\u2013240). ACM. https://doi.org/10.1145/1143844.1143874"
+    },
+    {
+      "label": "0.1 reference \u2014 Saito and Rehmsmeier (2015)",
+      "old": "",
+      "new": "Saito, T., & Rehmsmeier, M. (2015). The precision-recall plot is more informative than the ROC plot when evaluating binary classifiers on imbalanced datasets. PLOS ONE, 10(3), e0118432. https://doi.org/10.1371/journal.pone.0118432"
+    },
+    {
+      "label": "0.2 \u00a76.3.2 results-to-interpretation",
+      "old": "The matched comparison called for above was subsequently run and is reported in full in Appendix C. Eight paired blocks, each one static and one adaptive 180-second trial with phase order randomised in advance, were executed on 7 September 2026 against real Cowrie SSH and Telnet services in isolated network namespaces. It postdates the frozen evaluation of Chapter 5 and does not revise any figure in it.",
+      "new": "The method and results are reported in Section 5.3.6, with the full protocol and outcome tables in Appendix C; they are not repeated here. Read against RQ2, the replication establishes the cost side of adaptive exposure: withdrawing the advertised endpoints denied access to clients that continued to address them, substantially reduced authorised-session continuity, and produced fewer Cowrie interactions under the fixed workload."
+    },
+    {
+      "label": "0.2 \u00a76.3.2 remove duplicated paragraph \u2014 The result is directional and large.",
+      "old": "The result is directional and large. Post-scan benign application success fell from 159 of 160 attempts (99.4 per cent) under static exposure to 32 of 160 (20.0 per cent) under adaptive exposure, a mean paired difference of -79.4 percentage points. Scanner TCP reachability fell from 87.0 to 17.4 per cent. Cowrie independently corroborated 191 authorised sessions in the static trials against 64 in the adaptive trials, and 80 scanner authentication outcomes against 16. Rotation fired in all eight adaptive trials at a mean of 60.2 seconds.",
+      "new": ""
+    },
+    {
+      "label": "0.2 \u00a76.3.2 remove duplicated paragraph \u2014 Read against RQ2, this measures the cost side",
+      "old": "Read against RQ2, this measures the cost side of the trade-off and leaves the benefit side open. What it establishes is that endpoint withdrawal is real, repeatable and consequential: once the controller moves the PREROUTING redirects, any client still addressing the original ports loses access, and the honeypot consequently observes fewer interactions rather than more. Under this workload adaptive exposure reduced collected interaction volume; it did not increase it.",
+      "new": ""
+    },
+    {
+      "label": "0.2 \u00a76.3.2 remove duplicated paragraph \u2014 Three boundaries prevent this",
+      "old": "Three boundaries prevent this from being read as a full answer. First, the precondition set out in Section 7.3.6 was not met: Cowrie's direct listeners on 2222 and 2223 remained reachable within the laboratory network, so the mechanism demonstrated is endpoint withdrawal rather than concealment. Second, and most importantly, the scripted scanner did not re-enumerate after its initial sweep; it continued to probe the original ports. The reconnaissance-delay benefit predicted by the moving-target literature (Lei et al., 2018; Luo et al., 2017) depends precisely on an attacker who re-scans, and an adversary scripted not to re-scan cannot exhibit it. The question posed in Section 7.1, whether an attacker forced to re-enumerate generates measurably more log activity, therefore remains open. Third, the authorised client was a controlled, independently labelled workload rather than organic traffic, so the continuity cost is characterised against a cooperative baseline and not against real users.",
+      "new": ""
+    },
+    {
+      "label": "0.2 \u00a76.3.2 remove duplicated paragraph \u2014 The defensible position is therefore narrower",
+      "old": "The defensible position is therefore narrower than the research question as originally posed, and better supported than it was before the replication. Adaptive port exposure demonstrably withdraws the advertised attack surface, and that withdrawal carries a measurable and substantial continuity cost. Whether it improves intelligence collection depends on adversary behaviour that this design deliberately held fixed, and answering it requires the same experiment run against a re-scanning adversary with the Cowrie bind restriction in place.",
+      "new": ""
+    },
+    {
+      "label": "0.2 \u00a76.3.2 fixed-adversary limitation",
+      "old": "",
+      "new": "It does not establish the proposed intelligence benefit. The scanner never re-enumerated after rotation, so it could not exhibit the added probing, delay or evidence generation predicted for an adversary forced to rediscover the service. Cowrie's direct listeners also remained reachable inside the laboratory network, and the authorised client was a controlled workload rather than organic traffic. RQ2 therefore remains only partly answered: endpoint withdrawal and its continuity cost are demonstrated, while intelligence yield requires the re-scanning, bind-restricted experiment specified in Section 7.3.6."
+    },
+    {
+      "label": "0.3 \u00a75.3.5 completed comparison and remaining test",
+      "old": "What the experiment revealed. The theoretical basis for adaptive exposure comes from prior work on moving-target defence (Lei et al., 2018; Luo et al., 2017). The core argument is that imposing uncertainty on an attacker forces them to spend more time and generate more detectable activity in the reconnaissance phase. The nmap experiment confirms the first-order mechanism: probed ports disappear from the attack surface on subsequent scans. An architectural constraint was also identified: PREROUTING DNAT rules (22\u21922222, 23\u21922223) execute before the INPUT chain, meaning Cowrie-managed ports require PREROUTING modification to be properly hidden. What remains for future work is a matched-volume A/B comparison quantifying the difference in reconnaissance dwell time and log volume between Phase 1 and Phase 2.",
+      "new": "What the experiment revealed. The theoretical basis for adaptive exposure comes from prior work on moving-target defence (Lei et al., 2018; Luo et al., 2017). The core argument is that imposing uncertainty on an attacker forces them to spend more time and generate more detectable activity in the reconnaissance phase. The nmap experiment confirms the first-order mechanism: probed ports disappear from the attack surface on subsequent scans. An architectural constraint was also identified: PREROUTING DNAT rules (22\u21922222, 23\u21922223) execute before the INPUT chain, meaning Cowrie-managed ports require PREROUTING modification to be properly hidden. The paired live-service experiment in Section 5.3.6 subsequently tested fixed-endpoint withdrawal and continuity under matched static/adaptive trials. The remaining question is whether a re-scanning adversary generates additional evidence after forced rediscovery, as specified in Section 7.3.6."
+    },
+    {
+      "label": "0.3 \u00a76.3.1 historical result cross-reference",
+      "old": "It is important to be precise about what this experiment does and does not demonstrate. The experiment proves that the port-rotation mechanism operates correctly at the network level: one non-listening port (port 80) becomes invisible to subsequent scans. It does not demonstrate that intelligence collection improves. Ports 22 and 23, the actual Cowrie-backed services that collect credentials, remain visible under both phases because their PREROUTING DNAT rules execute before the INPUT chain and are not modified by the rotation logic. An attacker targeting the honeypot's real services is therefore not meaningfully impeded by the Phase 2 rotation in this experimental configuration. Demonstrating improved intelligence collection would require a matched A/B experiment measuring credential capture volume, attacker dwell time, and reconnection frequency under Phase 1 and Phase 2 conditions, which is identified as the primary future-work direction in Section 7.3.",
+      "new": "It is important to be precise about what this experiment does and does not demonstrate. The experiment proves that the port-rotation mechanism operates correctly at the network level: one non-listening port (port 80) becomes invisible to subsequent scans. On its own, it does not demonstrate that intelligence collection improves. Ports 22 and 23, the actual Cowrie-backed services that collect credentials, remain visible under both phases in this earlier configuration because their PREROUTING redirects are unchanged. The paired experiment in Section 5.3.6 later tested real Cowrie-backed services and showed fewer interactions under a fixed, non-re-enumerating scanner. Whether forced rediscovery produces additional evidence remains untested and is specified in Section 7.3.6."
+    },
+    {
+      "label": "0.3 \u00a76.8 RQ2 summary",
+      "old": "RQ2 is mechanically confirmed but not fully answered: the port-rotation mechanism operates as designed, but the thesis does not demonstrate that intelligence collection improves under Phase 2 conditions. The adaptive rotation mechanism is mechanically correct and empirically confirmed: the controlled nmap experiment (Table 6.1) demonstrated port 80 changing from closed to filtered after rotation, confirming the moving-target effect operates as designed. PREROUTING rotation for Cowrie-managed ports (22, 23) was implemented in the controller as a code extension: when a new scanner is detected, the controller inserts a new REDIRECT rule targeting the next port in the rotation pool. Two implementation limitations identified during code review prevent the full moving-target effect from being achieved: (1) Cowrie binds on 0.0.0.0:2222 and 0.0.0.0:2223, so those service ports remain directly reachable regardless of the PREROUTING rule, and (2) the rule-deletion method (del_prerouting_redirect) uses generic parameters that will not match the interface-specific rules inserted by setup_cowrie_portfwd.sh, so rule removal may silently fail. The PREROUTING mechanism is partially implemented, and empirical validation with a live nmap re-probe is a precondition for claiming the full moving-target effect. What the thesis cannot yet demonstrate is the downstream intelligence benefit: how much additional reconnaissance work a real attacker must perform when forced to re-enumerate. Quantifying this requires a matched-volume A/B experiment in which Phase 1 and Phase 2 sessions use equal attack tooling, the primary Phase 2 future-work direction.",
+      "new": "RQ2 is mechanically confirmed but not fully answered. Table 6.1 established that the controller can hide a probed non-Cowrie port, and the paired live-service experiment in Section 5.3.6 demonstrated repeatable withdrawal of the original Cowrie endpoints together with a substantial continuity cost and fewer interactions under the fixed workload. That experiment did not test whether forced rediscovery increases intelligence collection: the scanner did not re-enumerate, and Cowrie's direct listeners remained reachable inside the laboratory network. Section 7.3.6 therefore specifies a repeat with a re-scanning adversary after the Cowrie bind restriction is applied."
+    },
+    {
+      "label": "0.3 \u00a77.1 RQ2 answer",
+      "old": "The adaptive mechanism is mechanically correct and its core port-hiding effect is empirically confirmed. The controller detects scan thresholds, rotates port sets from the predefined allow-list, and applies iptables rules without manual intervention. The controlled nmap experiment (Table 6.1) demonstrated that port 80 changed from closed (reachable) in Phase 1 to filtered (unreachable) in Phase 2, confirming the moving-target effect operates as designed. PREROUTING rotation for Cowrie-managed ports (22, 23) was implemented in the controller: when a new scanner is detected, the controller adds REDIRECT rules targeting the next ports in the rotation pools (SSH: [22, 2022, 5022], Telnet: [23, 2023, 5023]). Two implementation limitations remain unresolved: Cowrie binds on 0.0.0.0:2222 and 0.0.0.0:2223, keeping those service ports directly reachable, and the rule-deletion method will not match the interface-specific rules from setup_cowrie_portfwd.sh. Empirical validation with an nmap re-probe is required before the full moving-target effect can be claimed. What the thesis cannot yet demonstrate is the downstream intelligence benefit: whether an attacker forced to re-enumerate generates measurably more Zeek log entries or takes longer to reach the credential-submission phase. Quantifying this requires the matched-volume A/B experiment identified in Section 7.3.6.",
+      "new": "The adaptive mechanism is mechanically correct and its fixed-endpoint withdrawal effect is empirically confirmed. Table 6.1 demonstrated a non-Cowrie port changing from closed to filtered, while the paired experiment in Section 5.3.6 tested real Cowrie SSH and Telnet services across eight static/adaptive blocks. Adaptive rotation withdrew the advertised endpoints, imposed a mean 79.4-percentage-point reduction in authorised-client continuity and reduced subsequent Cowrie interactions under the fixed workload. This answers the mechanism and cost parts of RQ2, but it does not establish an intelligence benefit: the scanner did not re-enumerate after rotation, and Cowrie's direct listeners remained reachable inside the laboratory network. Section 7.3.6 defines the remaining test against a re-scanning adversary with the bind restriction applied."
+    },
+    {
+      "label": "0.3 \u00a77.3.6 remaining experiment",
+      "old": "The controlled nmap experiment (Table 6.1, Section 6.3.1) confirmed that the rotation mechanism hides probed ports and identified the PREROUTING architectural constraint. Before the A/B comparison is run, two PREROUTING implementation gaps must be resolved: (1) Cowrie must be configured to bind on a loopback or internal interface only (not 0.0.0.0), so that direct access to ports 2222/2223 is blocked externally, and (2) del_prerouting_redirect() must include the same interface qualifier (-i enp0s3) used when the rules were inserted. Once resolved, the natural extension is a matched-volume A/B comparison: 1,000 simulated scan events under Phase 1 (static) versus Phase 1 followed by Phase 2 (adaptive), measuring the number of additional probe attempts required, total time-to-exploit, and Zeek log volume generated. This would quantify the reconnaissance-delay benefit rather than demonstrating the underlying mechanism alone.",
+      "new": "The matched static/adaptive experiment was run and is reported in Section 5.3.6 and Appendix C. It demonstrated repeatable withdrawal of the original endpoints and a substantial continuity cost under a fixed scanner that continued to probe the same ports. It did not test the reconnaissance-delay hypothesis because the scanner did not re-enumerate, and Cowrie remained bound to 0.0.0.0 so its direct listeners were still reachable inside the laboratory network. The remaining work is to bind Cowrie to a loopback or internal interface, repeat the paired design with an adversary that re-scans after each rotation, and measure additional probe attempts, time to authentication, Zeek and Cowrie evidence volume, and authorised-client continuity. That experiment would test whether forced rediscovery improves intelligence collection rather than only confirming endpoint withdrawal."
+    },
+    {
+      "label": "0.4 remove collapsed Figure 2\u201325 LoF entry",
+      "old": "Figure 2\u2013Figure 25 Annotated screenshots of system deployment and evaluation (see Appendix A)",
+      "new": ""
+    },
+    {
+      "label": "0.4 List of Figures \u2014 Figure 2",
+      "old": "",
+      "new": "Figure 2   Cowrie honeypot pip install completing successfully inside the cowrie-env virtual environment (Appendix A)"
+    },
+    {
+      "label": "0.4 List of Figures \u2014 Figure 3",
+      "old": "",
+      "new": "Figure 3   scikit-learn, pandas, numpy and joblib downloading and installing into the honeypot venv (Appendix A)"
+    },
+    {
+      "label": "0.4 List of Figures \u2014 Figure 4",
+      "old": "",
+      "new": "Figure 4   Grafana 13.1.0 home screen confirming the web UI is accessible on port 3000 (Appendix A)"
+    },
+    {
+      "label": "0.4 List of Figures \u2014 Figure 5",
+      "old": "",
+      "new": "Figure 5   Grafana dashboard showing the Cowrie SSH/Telnet Events panel and the live Zeek Connection Log stream (Appendix A)"
+    },
+    {
+      "label": "0.4 List of Figures \u2014 Figure 6",
+      "old": "",
+      "new": "Figure 6   pytest output showing 27 tests passing before the ML test module was added (Appendix A)"
+    },
+    {
+      "label": "0.4 List of Figures \u2014 Figure 7",
+      "old": "",
+      "new": "Figure 7   Port forwarding rules applied (TCP 22\u21922222, 23\u21922223) and the honeypot-controller systemd service confirmed active (running) (Appendix A)"
+    },
+    {
+      "label": "0.4 List of Figures \u2014 Figure 8",
+      "old": "",
+      "new": "Figure 8   Promtail systemd service repeatedly failing because an orphaned process from the manual start script still held port 9080 (Appendix A)"
+    },
+    {
+      "label": "0.4 List of Figures \u2014 Figure 9",
+      "old": "",
+      "new": "Figure 9   twistd raising CannotListenError on port 2223 (old process), while Loki is shown active (running) after the ExecStartPre fix (Appendix A)"
+    },
+    {
+      "label": "0.4 List of Figures \u2014 Figure 10",
+      "old": "",
+      "new": "Figure 10   All five systemd services (Loki, Promtail, Zeek, Cowrie, and the honeypot-controller) confirmed active (running) simultaneously (Appendix A)"
+    },
+    {
+      "label": "0.4 List of Figures \u2014 Figure 11",
+      "old": "",
+      "new": "Figure 11   Controller log showing sklearn feature-name UserWarnings from joblib workers, alongside the first shadow-mode would-block decisions for 10.0.2.15 (Appendix A)"
+    },
+    {
+      "label": "0.4 List of Figures \u2014 Figure 12",
+      "old": "",
+      "new": "Figure 12   Repeated sklearn.utils.parallel UserWarning lines (before the PYTHONWARNINGS fix), followed by DRY-RUN port-opening log entries from the adaptive controller (Appendix A)"
+    },
+    {
+      "label": "0.4 List of Figures \u2014 Figure 13",
+      "old": "",
+      "new": "Figure 13   Running install_all_services.sh after git pull: all five .service files installed and enabled in /etc/systemd/system/ (Appendix A)"
+    },
+    {
+      "label": "0.4 List of Figures \u2014 Figure 14",
+      "old": "",
+      "new": "Figure 14   Controller log after service restart confirming RF=rf_attack_type.joblib and IF=iforest_live.joblib are loaded and the ML pipeline (shadow mode active) is running (Appendix A)"
+    },
+    {
+      "label": "0.4 List of Figures \u2014 Figure 15",
+      "old": "",
+      "new": "Figure 15   Kali Linux showing eth1 assigned to the honeypot-net internal network: eth1 is up but has no IPv4 yet (assigned next step) (Appendix A)"
+    },
+    {
+      "label": "0.4 List of Figures \u2014 Figure 16",
+      "old": "",
+      "new": "Figure 16   After assigning 10.10.0.2/24 to eth1, ping -c 3 10.10.0.1 returns 0% packet loss confirming L3 connectivity on the internal network (Appendix A)"
+    },
+    {
+      "label": "0.4 List of Figures \u2014 Figure 17",
+      "old": "",
+      "new": "Figure 17   nmap -sS confirming ports 22 (SSH) and 23 (Telnet) are open on the honeypot: all other Phase 1 ports are closed from Kali's perspective (Appendix A)"
+    },
+    {
+      "label": "0.4 List of Figures \u2014 Figure 18",
+      "old": "",
+      "new": "Figure 18   Hydra failing with 'File for passwords not found' because rockyou.txt.gz had not yet been decompressed on the Kali VM (Appendix A)"
+    },
+    {
+      "label": "0.4 List of Figures \u2014 Figure 19",
+      "old": "",
+      "new": "Figure 19   Hydra successfully authenticating root:password against 10.10.0.1:22. The credential was captured and logged by Cowrie, not the real SSH daemon (Appendix A)"
+    },
+    {
+      "label": "0.4 List of Figures \u2014 Figure 20",
+      "old": "",
+      "new": "Figure 20   nmap OS and service detection scan completing in 51.76s, identifying the honeypot as a Linux host with service fingerprints on multiple ports (Appendix A)"
+    },
+    {
+      "label": "0.4 List of Figures \u2014 Figure 21",
+      "old": "",
+      "new": "Figure 21   Hydra attacking Telnet on port 23 with the full rockyou.txt wordlist: showing 14,344,399 login tries at ~2.86 tries/min (Appendix A)"
+    },
+    {
+      "label": "0.4 List of Figures \u2014 Figure 22",
+      "old": "",
+      "new": "Figure 22   Hydra telnet run completing after 42+ hours with 0 valid passwords: Cowrie's Telnet emulation was not returning success signals in a way Hydra recognised as valid (Appendix A)"
+    },
+    {
+      "label": "0.4 List of Figures \u2014 Figure 23",
+      "old": "",
+      "new": "Figure 23   Second Hydra SSH run using the unix_users + fasttrack wordlists finding root:Summer2021 in seconds: a weaker password caught by a smaller targeted list (Appendix A)"
+    },
+    {
+      "label": "0.4 List of Figures \u2014 Figure 24",
+      "old": "",
+      "new": "Figure 24   nmap top-1000 port scan revealing 22, 23, 2222 (Cowrie listen port), 3000 (Grafana), and 9080 (Promtail) as open: confirming the service exposure footprint (Appendix A)"
+    },
+    {
+      "label": "0.4 List of Figures \u2014 Figure 25",
+      "old": "",
+      "new": "Figure 25   Hydra final output showing 56 valid login:password pairs captured by Cowrie across multiple common usernames (root, pass, security, user, system, sys, wampp, newuser, xampp-dav-unsecure, vagrant) (Appendix A)"
+    }
+  ],
+  "toc": {
+    "existing_field_preserved": true,
+    "depth": "Heading 1\u20133",
+    "update_fields_on_open": true,
+    "duplicate_inserted": false
+  },
+  "phase_a_started": false,
+  "diff": "D:\\Claude\\honeypot\\artifacts\\thesis_phase0_20260907\\phase0_diff.md",
+  "diff_sha256": "cda190aa22f629a361c2d300d3625ffc35bfffbb2d2467cf93b4c234bcc9b605",
+  "logical_change_sites": 38,
+  "verification": {
+    "zip_ok": true,
+    "source_sha256": "22fc857bbfb1e742ff188ad00a50dfb25a67f99b50a9e5dd8fb24de13868f11f",
+    "output_sha256": "64fc8186e38c7fd9f68e11779ba19d69f9245f8558b32b1b3f1b5fb94348096b",
+    "package_parts_preserved_by_tracked_edit": true,
+    "roundtrip_package_parts": 53,
+    "media_files": 26,
+    "media_hashes_preserved": true,
+    "tables": 21,
+    "toc_field_count": 1,
+    "toc_instruction": " TOC \\z \\o \"1-3\" \\u \\h",
+    "toc_includes_section_5_3_6": true,
+    "toc_depth": "Heading 1\u20133",
+    "update_fields_on_open": false,
+    "expanded_figure_entries": 24,
+    "reference_entries": 27,
+    "missing_reference_entries": [],
+    "unused_reference_entries": [],
+    "nested_revision_errors": 0,
+    "revision_authors": {
+      "Author": 92,
+      "Author": 27
+    },
+    "insertions": 104,
+    "deletions": 15,
+    "roundtrip_preserved_revision_counts": true,
+    "accepted_preview_pdf": "D:\\Claude\\honeypot\\artifacts\\thesis_phase0_20260907\\render_accepted_final\\accepted_preview_final.pdf",
+    "accepted_preview_pages": 88,
+    "blank_pages": [],
+    "words_outside_page": [],
+    "visually_inspected_pages": [
+      4,
+      5,
+      7,
+      8,
+      9,
+      48,
+      49,
+      54,
+      60,
+      61,
+      62,
+      63,
+      66,
+      67,
+      68,
+      69
+    ],
+    "phase_a_started": false
+  }
+}

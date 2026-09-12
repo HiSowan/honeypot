@@ -1,0 +1,59 @@
+﻿{
+  "status": "complete",
+  "produced_by": "Author",
+  "date": "2026-09-07",
+  "supersedes": "thesis_v24_submission (withdrawn: rebuilt in a single pass to avoid a second round-trip)",
+  "inputs": {
+    "revised_draft": "artifacts/phase12_revision_20260906/final/thesis_v23_revised_with_replication.docx",
+    "revised_draft_sha256_verified": "2e9b5e3119856a6e5adbeb7406c1529f1c605111366a6df558f32f52eaf7e447",
+    "authoritative_source": "D:/Downloads/thesis_v23.docx",
+    "authoritative_source_sha256": "8c3b13278c1dee7169bb706a5d0193df89b687408eca9276359fc75258862c1e",
+    "authoritative_source_modified": false
+  },
+  "outputs": {
+    "thesis_v25_submission.docx": "e02f21ffe25eb7b68a00cf0b5a70b9406419a9b42d8cc5ea8a84d27304ab6e13",
+    "thesis_v25_submission.pdf": "4b5ec11534125e6689913aeadc4e115eaf1ba8225fa53f6ada0b4a51bdd5420b"
+  },
+  "build": "single pass: build_v25.py over the revised draft, then one LibreOffice field refresh. Edits are located by text match, not paragraph index.",
+  "change_sites": 12,
+  "changes": [
+    "Submission month August -> September 2026 (title page, declaration date, abstract-page date). Historical dates left alone: Table 6.1 2026-08-22, Appendix C 7 September 2026, reference retrieval dates.",
+    "F-1 at 4 sites (Section 4.7 class count, Section 5.2.1 absent-class mechanism, Appendix B.1 note, new Section 6.6 limitation): the 1,746 Backdoor records were relabelled Normal, not excluded; arithmetic proof from the Table B.1 supports; effect bounded at 1.0 pp weighted accuracy and macro F1 no lower than 0.53.",
+    "F-2 at 2 sites (Section 5.2.1 CV claim, Section 6.5 benchmark paragraph): the 5-fold CV is no longer described as validating the corrected production RF.",
+    "NEW Section 6.3.2 'Replicated Paired Experiment with Live Services' (6 paragraphs): brings Appendix C into the RQ2 argument. Previously Appendix C was referenced nowhere in Chapters 1-7.",
+    "Appendix C interpretation: added the adversary-model caveat (scripted scanner did not re-enumerate; authorised client was a controlled workload).",
+    "List of Figures: Figure C.1. List of Tables: Tables C.1-C.3. Table of Contents field refreshed."
+  ],
+  "canonical_numbers_changed": false,
+  "models_retrained": false,
+  "frozen_archives_read": false,
+  "protected_sections": {
+    "6.8_chapter_summary": "text identical to input",
+    "7.1_conclusions_rq2": "text identical to input",
+    "7.3.6_body": "text identical to input"
+  },
+  "rq2_position": "Section 6.3.2 states the position explicitly: adaptive exposure demonstrably withdraws the advertised attack surface at a large, measured continuity cost; whether it improves intelligence collection remains open because the scripted adversary was held non-adapting. Sections 6.8, 7.1 and 7.3.6 remain accurate as written and were not touched.",
+  "verification": {
+    "physical_pages": 88,
+    "paragraph_change_sites_vs_input": 12,
+    "all_change_sites_intended": true,
+    "canonical_figures_spot_checked": 21,
+    "canonical_figures_missing": 0,
+    "toc_contains_appendix_c": true,
+    "toc_contains_6_3_2": true,
+    "pages_inspected_at_full_resolution": [
+      5,
+      52,
+      58,
+      82,
+      83
+    ],
+    "clipping_or_overlap_found": false,
+    "note": "Pages 42 and 47 show 0.1pt table-border geometry drift from LibreOffice column-width recalculation; page text is byte-identical. Pages after the insertion reflow, so page-image comparison is not meaningful there; the paragraph-level diff is the authoritative check."
+  },
+  "notes": [
+    "The DOCX carries a refreshed ToC and w:updateFields=true, so Word rebuilds fields on open.",
+    "The PDF is a LibreOffice render, matching the previously approved render pipeline. For a Word-exported PDF, open the DOCX in Word, allow the field update, and export; pagination may shift.",
+    "Pre-existing and NOT changed: List of Tables entries and Section 6.6 limitation lead-ins are inconsistently bolded in the source. New entries match their immediate neighbours."
+  ]
+}

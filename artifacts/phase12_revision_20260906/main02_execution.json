@@ -1,0 +1,6 @@
+﻿{
+  "command": "sudo -S -p \"\" env FIREWALL_LIVE=1 /tmp/phase12-env-QlgLx4w4/venv/bin/python /tmp/phase12-check-g4jC920P/scripts/phase12_experiment.py --run --approve-isolated-network-changes --output /tmp/phase12-main-20260907-02 --prefix p12-main002 --python /tmp/phase12-env-QlgLx4w4/venv/bin/python",
+  "stdout": "",
+  "stderr": "",
+  "exit": 0
+}

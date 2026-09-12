@@ -1,0 +1,20 @@
+﻿{
+  "zip_ok": true,
+  "source_media_files_preserved": 26,
+  "output_media_files": 27,
+  "tables": 21,
+  "phase_b_table_column_counts": [
+    10,
+    12,
+    12
+  ],
+  "abstract_word_count_excluding_keywords": 339,
+  "nested_revision_errors": 0,
+  "revision_authors": {
+    "Author": 261,
+    "Author": 27
+  },
+  "required_claim_checks": 13,
+  "stale_claim_checks": 7,
+  "update_fields_on_open": true
+}

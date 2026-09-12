@@ -1,0 +1,51 @@
+﻿{
+  "status": "phase_b_complete",
+  "source_sha256": "64fc8186e38c7fd9f68e11779ba19d69f9245f8558b32b1b3f1b5fb94348096b",
+  "phase_a_results_sha256": "5592de5461f46162ef729b6d049bfa7578fb8ebc6bbd83c2391298f8caf95dd4",
+  "output_sha256": "3281364b5f88e80bda0a17fd4ab3bee01b0e0368827fcceb84d7b8dc5350bfba",
+  "diff_sha256": "188547ee81c7ad8b4e9d55f94b87bd7b2b082b4290c8a32f868d3aebfa99afd1",
+  "figure26_sha256": "538787d5696033d7039a2cc83ab5d8a92e8d148c38b26a89c4deb38b714bd9ad",
+  "accepted_preview_pdf_sha256": "50818148fee0635dcb369fe89ad319dc97987cffd36d787c0aebbda2be35bd2c",
+  "zip_ok": true,
+  "source_media_files_preserved": 26,
+  "output_media_files": 27,
+  "tables": 21,
+  "phase_b_table_column_counts": [
+    10,
+    12,
+    12
+  ],
+  "abstract_word_count_excluding_keywords": 339,
+  "toc_entries": 117,
+  "toc_page_numbers_refreshed_from_accepted_layout": true,
+  "update_fields_on_open": true,
+  "nested_revision_errors": 0,
+  "revision_authors": {
+    "Author": 261,
+    "Author": 27
+  },
+  "insertions": 210,
+  "deletions": 78,
+  "required_claim_checks": 14,
+  "stale_claim_checks": 9,
+  "render_pages": 84,
+  "blank_pages": [],
+  "words_outside_page": [],
+  "visually_inspected_all_pages": true,
+  "full_size_pages_inspected": [
+    10,
+    36,
+    42,
+    43,
+    44,
+    48,
+    54,
+    55,
+    57
+  ],
+  "pytest": "107 passed in 2.16s",
+  "git_diff_check": "passed",
+  "vm_changed": false,
+  "ml_source_changed": false,
+  "product_code_changed": false
+}

@@ -1,0 +1,16 @@
+﻿{
+  "zip_ok": true,
+  "media_files_preserved": 27,
+  "tables": 21,
+  "abstract_word_count_excluding_keywords": 341,
+  "nested_revision_errors": 0,
+  "revision_authors": {
+    "Author": 274,
+    "Author": 27
+  },
+  "insertions": 223,
+  "deletions": 78,
+  "required_claim_checks": 12,
+  "stale_claim_checks": 4,
+  "update_fields_on_open": true
+}

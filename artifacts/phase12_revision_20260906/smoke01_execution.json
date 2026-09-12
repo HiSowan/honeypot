@@ -1,0 +1,6 @@
+﻿{
+  "command": "sudo -S -p \"\" env FIREWALL_LIVE=1 /tmp/phase12-prep-Dksm1KqQ/venv/bin/python /tmp/phase12-check-g4jC920P/scripts/phase12_experiment.py --run --smoke --approve-isolated-network-changes --output /tmp/phase12-smoke-20260907-01 --prefix p12-smoke01 --python /tmp/phase12-prep-Dksm1KqQ/venv/bin/python",
+  "exit": 127,
+  "stdout": "",
+  "stderr": "env: \u2018/tmp/phase12-prep-Dksm1KqQ/venv/bin/python\u2019: No such file or directory\n"
+}

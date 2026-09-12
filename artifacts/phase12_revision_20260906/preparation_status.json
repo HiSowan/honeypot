@@ -1,0 +1,17 @@
+﻿{
+  "status": "prepared; approval and integration smoke pending",
+  "experiment_executed": false,
+  "local_tests_passed": 105,
+  "isolated_ubuntu_tests_passed": 105,
+  "vm_test_directory": "/tmp/phase12-check-g4jC920P",
+  "thesis_source_unchanged": true,
+  "latest_draft_render_verified": false,
+  "sha256": {
+    "scripts\\phase12_experiment.py": "07ba940571033da87202b9385db55849e18bf3599c7ee0e15352d76ba073cd4d",
+    "tests\\test_phase12_experiment.py": "25a4c931b9fe83300bbdf0a6dea106366fd9d6fffdb8e5f3c882d176e2271575",
+    "tests\\test_phase12_analysis.py": "267a7dbc0a93a92cbb81a7502d33c6fcf3d7a905418766a521a10a22cdf266af",
+    "artifacts\\phase12_revision_20260906\\experiment_protocol.md": "de51fb88a2c5eaf70505acc6cc9f980e4d5faa3812593091e0c0ffc8d2914346",
+    "artifacts\\phase12_revision_20260906\\planned_trials.json": "841e7320c86b3b7ad278d879145ea2e07ed122c5568377cfb3e9a6bf8b854d37",
+    "artifacts\\phase12_revision_20260906\\thesis_v23_revised_draft.docx": "7800b785e3bbb82953125be560bc95b991c5c1ca4a94dc5f41aec32b1b423485"
+  }
+}

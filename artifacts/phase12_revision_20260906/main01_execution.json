@@ -1,0 +1,6 @@
+﻿{
+  "command": "sudo -S -p \"\" env FIREWALL_LIVE=1 /tmp/phase12-env-QlgLx4w4/venv/bin/python /tmp/phase12-check-g4jC920P/scripts/phase12_experiment.py --run --approve-isolated-network-changes --output /tmp/phase12-main-20260907-01 --prefix p12-main001 --python /tmp/phase12-env-QlgLx4w4/venv/bin/python",
+  "stdout": "",
+  "stderr": "Traceback (most recent call last):\n  File \"/tmp/phase12-check-g4jC920P/scripts/phase12_experiment.py\", line 606, in <module>\n    main()\n  File \"/tmp/phase12-check-g4jC920P/scripts/phase12_experiment.py\", line 595, in main\n    run_trial(root, spec, args.prefix, snapshot, args.python)\n  File \"/tmp/phase12-check-g4jC920P/scripts/phase12_experiment.py\", line 388, in run_trial\n    validate_observations(events, status['start_monotonic'])\n  File \"/tmp/phase12-check-g4jC920P/scripts/phase12_experiment.py\", line 432, in validate_observations\n    raise ValueError('Workload exceeded predeclared timing tolerance')\nValueError: Workload exceeded predeclared timing tolerance\n",
+  "exit": 1
+}

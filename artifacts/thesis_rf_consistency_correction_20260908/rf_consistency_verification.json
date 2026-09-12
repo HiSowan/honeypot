@@ -1,0 +1,47 @@
+﻿{
+  "status": "rf_consistency_correction_complete",
+  "source_sha256": "3d9e79da3d2cda64a10e55d108d0dfe71fc6246b7ce14629959dae24e4e7e2cf",
+  "identity_evidence_sha256": "bc5b9b340e074836de5d44a52821fb1ea26eb5739316f1c2d13e023896f7e606",
+  "output_sha256": "e466ce66389eb4b559a4756e1ed3874858146503dda1679e456ea609e1c0fd3a",
+  "diff_sha256": "7cb4ec25eab8492f5bf235d485d54064d2f2fb7ee03377713eb41f49b7abfd14",
+  "accepted_preview_pdf_sha256": "70e4ea657a5051e6149e366e23def8d1d391bf58cd3f8dbfb4a6a554321bcb6c",
+  "zip_ok": true,
+  "media_files_preserved": 27,
+  "tables": 21,
+  "abstract_word_count_excluding_keywords": 341,
+  "toc_entries": 117,
+  "toc_page_numbers_refreshed_from_accepted_layout": true,
+  "update_fields_on_open": true,
+  "nested_revision_errors": 0,
+  "revision_authors": {
+    "Author": 274,
+    "Author": 27
+  },
+  "insertions": 223,
+  "deletions": 78,
+  "identity_result": {
+    "binary_detected": 4,
+    "multiclass_detected": 4,
+    "intersection": 0,
+    "binary_only": 4,
+    "multiclass_only": 4
+  },
+  "reported_rate": "4/1,544 = 0.259%, rounded to 0.3%",
+  "render_pages": 84,
+  "blank_pages": [],
+  "words_outside_page": [],
+  "changed_pages": [
+    10,
+    42,
+    59,
+    60
+  ],
+  "pixel_identical_unchanged_pages": 80,
+  "visually_inspected_changed_pages": true,
+  "pytest": "107 passed in 8.62s",
+  "git_diff_check": "passed (pre-existing LF/CRLF warning for .gitignore)",
+  "vm_state_changed": false,
+  "temporary_vm_files_removed": true,
+  "ml_source_changed": false,
+  "product_code_changed": false
+}
