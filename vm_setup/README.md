@@ -1,132 +1,286 @@
-# VM Setup — Adaptive Honeypot System
+# Honeypot VM — Setup Guide
 
-Complete setup guide for the Ubuntu Server 24.04 VM.
-Run every step in order on the VM as a user with `sudo` rights.
+This folder contains everything needed to build the honeypot VM from a fresh Ubuntu Server 24.04 install.
+Work through the sections in order. Each section tells you what to type and what to expect.
 
 ---
 
-## Prerequisites
+## Before you start
 
-- Ubuntu Server 24.04 fresh install
-- VirtualBox host-only or NAT network configured
-- Python 3.12+, git, pip installed
-- Zeek 8.2 installed at `/opt/zeek/`
-- Cowrie cloned to `/home/cowrie/cowrie/`
+You need a fresh Ubuntu Server 24.04 VM. The guide assumes:
+- Username: `vboxuser`
+- Home directory: `/home/vboxuser`
+- Network interface: `enp0s3`
 
-Clone the repo and activate the venv before running any script:
+Open a terminal on the VM (or SSH in from your Windows host at `192.168.0.3`).
+
+---
+
+## Part 1 — System packages
+
+Install the tools everything else depends on:
 
 ```bash
-cd ~/honeypot
-git clone <repo-url> .
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y git python3 python3-pip python3-venv curl unzip \
+    iptables iptables-persistent netfilter-persistent
+```
+
+---
+
+## Part 2 — Install Zeek
+
+Zeek is the network monitor. It parses live traffic into log files the controller reads.
+
+```bash
+# Add the Zeek repository and install
+echo 'deb http://download.opensuse.org/repositories/security:/zeek/xUbuntu_24.04/ /' \
+    | sudo tee /etc/apt/sources.list.d/security:zeek.list
+curl -fsSL https://download.opensuse.org/repositories/security:zeek/xUbuntu_24.04/Release.key \
+    | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/security_zeek.gpg > /dev/null
+sudo apt update
+sudo apt install -y zeek-6.0
+
+# Add Zeek to PATH so you can run it by name
+echo 'export PATH=$PATH:/opt/zeek/bin' >> ~/.bashrc
+source ~/.bashrc
+
+# Verify
+zeek --version
+```
+
+---
+
+## Part 3 — Install Cowrie
+
+Cowrie is the SSH/Telnet honeypot. It needs its own system user.
+
+```bash
+# Create the cowrie user (no login shell, no home login)
+sudo adduser --disabled-password --gecos "" cowrie
+
+# Clone Cowrie into that user's home directory
+sudo -u cowrie git clone https://github.com/cowrie/cowrie /home/cowrie/cowrie
+
+# Set up Cowrie's Python environment
+sudo -u cowrie bash -c "
+    cd /home/cowrie/cowrie
+    python3 -m venv cowrie-env
+    cowrie-env/bin/pip install --upgrade pip
+    cowrie-env/bin/pip install -r requirements.txt
+"
+```
+
+---
+
+## Part 4 — Install Loki
+
+Loki is the log aggregation server. Grafana reads from it.
+
+```bash
+# Create the loki user and directories
+sudo adduser --system --no-create-home --group loki
+sudo mkdir -p /opt/loki/data/chunks /opt/loki/data/rules
+sudo chown -R loki:loki /opt/loki
+
+# Download Loki binary
+curl -O -L https://github.com/grafana/loki/releases/download/v3.0.0/loki-linux-amd64.zip
+unzip loki-linux-amd64.zip
+sudo mv loki-linux-amd64 /opt/loki/loki
+sudo chmod +x /opt/loki/loki
+rm loki-linux-amd64.zip
+
+# Copy the Loki config from this folder
+sudo cp config/loki/loki-config.yaml /opt/loki/loki-config.yaml
+```
+
+---
+
+## Part 5 — Install Grafana
+
+Grafana is the dashboard you view in a browser.
+
+```bash
+sudo apt install -y apt-transport-https software-properties-common
+wget -q -O - https://apt.grafana.com/gpg.key | sudo apt-key add -
+echo "deb https://apt.grafana.com stable main" | sudo tee /etc/apt/sources.list.d/grafana.list
+sudo apt update
+sudo apt install -y grafana
+
+sudo systemctl enable grafana-server
+sudo systemctl start grafana-server
+```
+
+---
+
+## Part 6 — Clone the repo and set up Python
+
+The controller and ML code live in the main repo. Clone it into `/home/vboxuser/honeypot`:
+
+```bash
+cd /home/vboxuser
+git clone <repo-url> honeypot
+cd honeypot
+
+# Create the virtual environment
 python3 -m venv venv
 source venv/bin/activate
+pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
+Keep the venv activated for the remaining steps.
+
 ---
 
-## Step 1 — Install services (`1_install/`)
+## Part 7 — Install Promtail
 
-Run once after cloning. Installs and enables all system services.
-
-| Script | What it does |
-|--------|--------------|
-| `install_all_services.sh` | Installs Zeek, Loki, Promtail, Cowrie, and the controller in one pass |
-| `install_controller_service.sh` | Registers the Python controller as a systemd service |
-| `install_promtail.sh` | Installs Promtail log shipper |
-| `enable_ssh_password.sh` | Enables SSH password auth on the VM (needed for benign-client test traffic) |
+Promtail ships log files to Loki. Run the install script from inside the repo:
 
 ```bash
-bash 1_install/install_all_services.sh
-bash 1_install/install_controller_service.sh
-bash 1_install/install_promtail.sh
+cd /home/vboxuser/honeypot/vm_setup
+sudo bash 1_install/install_promtail.sh
+```
+
+This downloads the Promtail binary, puts it at `/opt/promtail/promtail`, and copies the config.
+
+---
+
+## Part 8 — Copy configs into place
+
+The `config/` folder here contains the runtime configs for every service. Copy them:
+
+```bash
+cd /home/vboxuser/honeypot/vm_setup
+
+# Cowrie
+sudo cp config/cowrie/cowrie.cfg /home/cowrie/cowrie/etc/cowrie.cfg
+
+# Loki (already done in Part 4 — skip if you did it)
+# sudo cp config/loki/loki-config.yaml /opt/loki/loki-config.yaml
+
+# Promtail (already done by install_promtail.sh — skip if you ran it)
+# sudo cp config/promtail/promtail-config.yaml /opt/promtail/promtail-config.yaml
+
+# Controller configs (allowlist, phase, port allowlist)
+sudo cp config/allowlist.txt /home/vboxuser/honeypot/config/allowlist.txt
+sudo cp config/phase.conf /home/vboxuser/honeypot/config/phase.conf
+sudo cp config/port_allowlist.yaml /home/vboxuser/honeypot/config/port_allowlist.yaml
 ```
 
 ---
 
-## Step 2 — Configure services (`2_configure/`)
+## Part 9 — Install systemd services
 
-Run after installation. Order matters.
-
-| Script | What it does |
-|--------|--------------|
-| `setup_cowrie_portfwd.sh` | Adds iptables PREROUTING rules to redirect port 22/23 → Cowrie listeners |
-| `setup_grafana.sh` | Configures Grafana datasource (Loki) and dashboard provider |
-| `set_phase.sh` | Sets the active phase (`static` / `adaptive` / `adaptive_ml`) |
-| `apply_egress_lockdown.sh` | **Deploy-time only** — applies default-deny outbound rules; do NOT run during development |
+This registers all services to start automatically on boot:
 
 ```bash
-bash 2_configure/setup_cowrie_portfwd.sh
-bash 2_configure/setup_grafana.sh
-bash 2_configure/set_phase.sh adaptive   # or: static / adaptive_ml
+cd /home/vboxuser/honeypot/vm_setup
+sudo bash 1_install/install_all_services.sh
+sudo bash 1_install/install_controller_service.sh
 ```
 
-> `apply_egress_lockdown.sh` is for production deployment only. Internet must stay open during development.
+After this, every service is enabled. They will start on the next reboot, or you can start them manually in Part 11.
 
 ---
 
-## Step 3 — Install systemd units (`3_services/`)
+## Part 10 — Configure Grafana
 
-Copy unit files into place and reload systemd:
+This copies the Loki datasource and dashboard into Grafana, then restarts it:
 
 ```bash
-sudo cp 3_services/*.service /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable cowrie honeypot-controller loki promtail zeek
+cd /home/vboxuser/honeypot/vm_setup
+sudo bash 2_configure/setup_grafana.sh
 ```
+
+Open `http://<vm-ip>:3000` in your browser. Log in with `admin` / `admin` and change the password when prompted. The Loki datasource and the honeypot dashboard should already be there.
 
 ---
 
-## Step 4 — Start / stop services (`4_operate/`)
+## Part 11 — Set up Cowrie port forwarding
 
-| Script | What it does |
-|--------|--------------|
-| `start_controller.sh` | Starts the Python adaptive controller |
-| `stop_controller.sh` | Stops the controller |
-| `start_cowrie.sh` | Starts the Cowrie SSH/Telnet honeypot |
-| `stop_cowrie.sh` | Stops Cowrie |
-| `start_loki.sh` | Starts the Loki log aggregator |
-| `start_promtail.sh` | Starts Promtail (ships logs to Loki) |
+This redirects external SSH (port 22) and Telnet (port 23) traffic into Cowrie's listeners.
+Your own SSH session from the Windows host is excluded so you don't lock yourself out.
 
 ```bash
-bash 4_operate/start_cowrie.sh
-bash 4_operate/start_loki.sh
-bash 4_operate/start_promtail.sh
-bash 4_operate/start_controller.sh
+cd /home/vboxuser/honeypot/vm_setup
+sudo bash 2_configure/setup_cowrie_portfwd.sh
+```
+
+The rules are saved to `/etc/iptables/rules.v4` and restored automatically on reboot.
+
+---
+
+## Part 12 — Set the operating phase
+
+Three phases are available. Start with `static` (no adaptive behavior, just data collection):
+
+```bash
+cd /home/vboxuser/honeypot/vm_setup
+sudo bash 2_configure/set_phase.sh static
+```
+
+You can switch later without restarting the controller:
+
+```bash
+sudo bash 2_configure/set_phase.sh adaptive       # enables port rotation
+sudo bash 2_configure/set_phase.sh adaptive_ml    # adds ML scoring (shadow mode by default)
 ```
 
 ---
 
-## Config files (`config/`)
+## Part 13 — Start everything
 
-Copy these into the repo's `config/` directory before starting services.
+```bash
+cd /home/vboxuser/honeypot/vm_setup
 
-| File | Purpose |
-|------|---------|
-| `config/allowlist.txt` | Operator IPs that must never be auto-blocked (includes 192.168.0.3) |
-| `config/phase.conf` | Active phase (`static` / `adaptive` / `adaptive_ml`) |
-| `config/port_allowlist.yaml` | Ports the controller may open/close |
-| `config/cowrie/cowrie.cfg` | Cowrie honeypot configuration |
-| `config/loki/loki-config.yaml` | Loki server configuration |
-| `config/promtail/promtail-config.yaml` | Promtail scrape config (points at Zeek + Cowrie logs) |
-| `config/grafana/provisioning/datasources/loki.yaml` | Grafana datasource (Loki at localhost:3100) |
-| `config/grafana/provisioning/dashboards/provider.yaml` | Grafana dashboard provider path |
+sudo bash 4_operate/start_loki.sh
+sudo bash 4_operate/start_promtail.sh
+sudo bash 4_operate/start_cowrie.sh
+sudo bash 4_operate/start_controller.sh
+```
 
----
+Check that each one is running:
 
-## Grafana
+```bash
+sudo systemctl status loki promtail cowrie zeek honeypot-controller
+```
 
-Grafana runs as a system service on port **3000**.
-Access at `http://<vm-ip>:3000` (default credentials: admin / admin — change on first login).
-
-The Loki datasource and dashboard provider are pre-configured in `config/grafana/`.
-Dashboards are loaded from `/var/lib/grafana/dashboards/` on the VM.
+All five should show `active (running)`.
 
 ---
 
-## Operator safety rules
+## Checking logs
 
-1. IP `192.168.0.3` (Windows host) must never be auto-blocked — it is in `config/allowlist.txt`.
-2. Shadow mode must be confirmed working before enabling live ML blocking (`adaptive_ml` phase).
-3. Egress lockdown (`apply_egress_lockdown.sh`) is deploy-time only — do not run during development.
-4. All firewall rule changes require manual approval before execution.
+| What to check | Command |
+|---|---|
+| Controller activity | `sudo tail -f /var/log/honeypot/controller.log` |
+| Controller via systemd | `sudo journalctl -u honeypot-controller -f` |
+| Cowrie sessions | `sudo tail -f /home/cowrie/cowrie/var/log/cowrie/cowrie.json` |
+| Loki | `sudo journalctl -u loki -f` |
+| Zeek | `ls /opt/zeek/logs/current/` |
+
+---
+
+## Stopping services
+
+```bash
+cd /home/vboxuser/honeypot/vm_setup
+sudo bash 4_operate/stop_controller.sh
+sudo bash 4_operate/stop_cowrie.sh
+```
+
+Or stop everything at once:
+
+```bash
+sudo systemctl stop honeypot-controller cowrie loki promtail zeek
+```
+
+---
+
+## Safety rules
+
+1. IP `192.168.0.3` (your Windows host) is in `config/allowlist.txt` and will never be auto-blocked.
+2. The controller runs in shadow mode by default — it logs what *would* be blocked but does not actually drop traffic. Verify shadow mode is working before enabling live blocking.
+3. The egress lockdown script (`2_configure/apply_egress_lockdown.sh`) cuts off outbound internet. **Do not run this during setup** — you still need internet access for installs. Only run it when the honeypot goes live on the target network.
+4. Any firewall rule changes require your manual approval.
