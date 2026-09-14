@@ -2,12 +2,12 @@
 # Install all honeypot components as systemd services.
 # After this, everything starts automatically on boot.
 #
-# Usage: sudo bash scripts/install_all_services.sh
+# Usage: sudo bash 1_install/install_all_services.sh
 
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-SCRIPTS="$REPO_DIR/scripts"
+SCRIPTS="$REPO_DIR/3_services"
 SYSTEMD="/etc/systemd/system"
 
 echo "Installing honeypot systemd services..."

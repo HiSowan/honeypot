@@ -2,12 +2,12 @@
 # Install the honeypot controller as a systemd service.
 # After this, the controller starts automatically on boot.
 #
-# Usage: sudo bash scripts/install_controller_service.sh
+# Usage: sudo bash 1_install/install_controller_service.sh
 
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-SERVICE_SRC="$REPO_DIR/scripts/honeypot-controller.service"
+SERVICE_SRC="$REPO_DIR/3_services/honeypot-controller.service"
 SERVICE_DST="/etc/systemd/system/honeypot-controller.service"
 LOG_DIR="/var/log/honeypot"
 
